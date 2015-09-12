@@ -1,0 +1,16 @@
+#messages {
+  color: #212121;
+  list-style: none;
+}
+
+#messages .line .time {
+  color: #727272;
+  margin-right: 0.5em;
+}
+
+#messages .line .nick {
+}
+
+#messages .line .msg {
+  padding-left: 1em;
+}

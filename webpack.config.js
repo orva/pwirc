@@ -5,14 +5,17 @@ module.exports = {
     path: __dirname  + '/dist',
     filename: 'bundle.js'
   },
-  loaders: [
-    {
-       test: /\.js$/,
-       loader: 'babel-loader'
-     },
-     {
-       test: /\.css$/,
-       loader: 'style!css'
-     }
-   ]
+  module: {
+    loaders: [
+      {
+        test: /\.jsx?$/,
+        exclude: /node_modules/,
+        loader: 'babel'
+      },
+      {
+        test: /\.css$/,
+        loader: 'style!css'
+      }
+    ]
+  }
 }
