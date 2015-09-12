@@ -1,0 +1,17 @@
+{
+  "ecmaFeatures": {
+    "modules": true,
+    "classes": true,
+    "blockBindings": true,
+    "arrowFunctions": true,
+    "jsx": true,
+  },
+  "rules": {
+    "semi": [2, "never"],
+    "quotes": [2, "single"]
+  },
+  "env": {
+    "node": true,
+    "browser": true
+  }
+}
