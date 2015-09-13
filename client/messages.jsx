@@ -7,14 +7,12 @@ import css from './messages.css'
 export default class Messages extends React.Component {
   constructor(props) {
     super(props)
-
-    this.createMockedMessages = this.createMockedMessages.bind(this)
-    this.formatTimestamp = this.formatTimestamp.bind(this)
-    this.render = this.render.bind(this)
-    this.state = { lines: this.createMockedMessages() }
+    this.state = {
+      lines: this.createMockedMessages()
+    }
   }
 
-  createMockedMessages() {
+  createMockedMessages = () => {
     const chance = Chance()
     const lines = R.times(index => {
       return {
@@ -28,7 +26,7 @@ export default class Messages extends React.Component {
     return lines
   }
 
-  formatTimestamp(date) {
+  formatTimestamp = (date) => {
     const hours = date.getHours()
     const mins = date.getMinutes()
     const hourStr = (hours < 10) ? '0' + hours : hours
@@ -37,17 +35,18 @@ export default class Messages extends React.Component {
     return hourStr + ':' + minStr
   }
 
-  render() {
-    const messages = R.map(line => {
-      return (
-        <li key={line.key} className="line">
-          <span className="time">{this.formatTimestamp(line.time)}</span>
-          <span className="nick">{line.user}:</span>
-          <span className="msg">{line.msg}</span>
-        </li>
-      )
-    }, this.state.lines)
+  createLineDOM = (line) => {
+    return (
+      <li key={line.key} className="line">
+        <span className="time">{this.formatTimestamp(line.time)}</span>
+        <span className="nick">{line.user}:</span>
+        <span className="msg">{line.msg}</span>
+      </li>
+    )
+  }
 
+  render = () => {
+    const messages = R.map(this.createLineDOM, this.state.lines)
     return <ul id="messages">{messages}</ul>
   }
 }

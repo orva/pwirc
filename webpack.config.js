@@ -10,7 +10,11 @@ module.exports = {
       {
         test: /\.jsx?$/,
         exclude: /node_modules/,
-        loader: 'babel'
+        loader: 'babel',
+        query: {
+          optional: ['es7.classProperties'],
+          stage: 0
+        }
       },
       {
         test: /\.css$/,
