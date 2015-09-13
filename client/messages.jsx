@@ -20,16 +20,6 @@ export default class Messages extends React.Component {
     return <ul id="messages">{messages}</ul>
   }
 
-  formatTimestamp = (datestr) => {
-    const date = new Date(datestr)
-    const hours = date.getHours()
-    const mins = date.getMinutes()
-    const hourStr = (hours < 10) ? '0' + hours : hours
-    const minStr = (mins < 10) ? '0' + mins : mins
-
-    return hourStr + ':' + minStr
-  }
-
   createLineDOM = (line) => {
     return (
       <li key={line.key} className="line">
@@ -38,5 +28,15 @@ export default class Messages extends React.Component {
         <span className="msg">{line.msg}</span>
       </li>
     )
+  }
+
+  formatTimestamp = (datestr) => {
+    const date = new Date(datestr)
+    const hours = date.getHours()
+    const mins = date.getMinutes()
+    const hourStr = (hours < 10) ? '0' + hours : hours
+    const minStr = (mins < 10) ? '0' + mins : mins
+
+    return hourStr + ':' + minStr
   }
 }
