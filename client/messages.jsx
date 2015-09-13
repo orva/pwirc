@@ -1,32 +1,27 @@
 import React from 'react'
 import R from 'ramda'
-import Chance from 'chance'
 
-import css from './messages.css'
+import _ from './messages.css'
 
 export default class Messages extends React.Component {
   constructor(props) {
     super(props)
-    this.state = {
-      lines: this.createMockedMessages()
-    }
+    this.state = { lines: [] }
   }
 
-  createMockedMessages = () => {
-    const chance = Chance()
-    const lines = R.times(index => {
-      return {
-        msg: chance.sentence(),
-        user: chance.first(),
-        time: chance.date({year: 2015}),
-        key: index
-      }
-    }, 200)
-
-    return lines
+  componentDidMount = () => {
+    this.props.sock.on('welcome', data => {
+      this.setState({ lines: data.lines })
+    })
   }
 
-  formatTimestamp = (date) => {
+  render = () => {
+    const messages = R.map(this.createLineDOM, this.state.lines)
+    return <ul id="messages">{messages}</ul>
+  }
+
+  formatTimestamp = (datestr) => {
+    const date = new Date(datestr)
     const hours = date.getHours()
     const mins = date.getMinutes()
     const hourStr = (hours < 10) ? '0' + hours : hours
@@ -43,10 +38,5 @@ export default class Messages extends React.Component {
         <span className="msg">{line.msg}</span>
       </li>
     )
-  }
-
-  render = () => {
-    const messages = R.map(this.createLineDOM, this.state.lines)
-    return <ul id="messages">{messages}</ul>
   }
 }
