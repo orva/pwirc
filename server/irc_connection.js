@@ -22,36 +22,41 @@ class ClientSession extends EventEmitter {
     this.channel = channel
     this.server = server
     this.messages = messages
-    this.listeners = this._setupChanneEventEmitters()
+    this.channelListeners = this._setupChannelEventlEmitters()
   }
 
   close() {
-    _removeChannelEventListeners()
+    this._removeChannelEventListeners()
+    this.channelListeners = undefined
     this.messages = undefined
     this.server = undefined
     this.channel = undefined
     this.client = undefined
+    console.log('session closed')
   }
 
-  _setupChanneEventlEmitters() {
+  getInitialState() {
+    return { lines: this.messages }
+  }
+
+  _setupChannelEventlEmitters() {
     const channelMsgListener = (from, to, msg) => {
       if (to !== this.channel)
         return
 
       const message = createMessageObject(this.server, from, to, msg)
-      emit('message', message)
+      this.emit('message', message)
     }
 
     this.client.on('message', channelMsgListener)
-    return [[ 'message', channelMsgListener ]]
+
+    return [{ type: 'message', cb: channelMsgListener }]
   }
 
   _removeChannelEventListeners() {
     R.forEach(listener => {
-      const ev = R.head(listener)
-      const cb = R.last(listener)
-      this.client.removeListener(ev, cb)
-    }, this.listeners)
+      this.client.removeListener(listener.type, listener.cb)
+    }, this.channelListeners)
   }
 }
 
@@ -70,8 +75,8 @@ function setupClient() {
 
   client.addListener('message', (from, to, msg) => {
     const message = createMessageObject(server, from, to, msg)
-    console.log('message', message)
     messages.push(message)
+    console.log('message', message)
   })
 
   return client

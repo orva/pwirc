@@ -13,6 +13,10 @@ export default class Messages extends React.Component {
     this.props.sock.on('welcome', data => {
       this.setState({ lines: data.lines })
     })
+
+    this.props.sock.on('message', msg => {
+      this.setState({ lines: R.append(msg, this.state.lines )})
+    })
   }
 
   render = () => {
