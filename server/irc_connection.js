@@ -48,9 +48,9 @@ class ClientSession extends EventEmitter {
 
   _removeChannelEventListeners() {
     R.forEach(listener => {
-      const event = R.head(listener)
+      const ev = R.head(listener)
       const cb = R.last(listener)
-      this.client.removeListener(evet, cb)
+      this.client.removeListener(ev, cb)
     }, this.listeners)
   }
 }

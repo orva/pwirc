@@ -8,6 +8,7 @@
     "jsx": true,
   },
   "rules": {
+    "no-unused-vars": 2,
     "semi": [2, "never"],
     "quotes": [2, "single"]
   },

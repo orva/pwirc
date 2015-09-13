@@ -1,7 +1,7 @@
 import React from 'react'
 import R from 'ramda'
 
-import _ from './messages.css'
+import './messages.css'
 
 export default class Messages extends React.Component {
   constructor(props) {
