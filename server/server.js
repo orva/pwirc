@@ -31,5 +31,5 @@ io.on('connection', sock => {
 })
 
 server.listen(31337, () => {
-  console.log('server starter, port 31337')
+  console.log('server started, port 31337')
 })
