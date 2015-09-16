@@ -3,6 +3,7 @@ import http from 'http'
 import express from 'express'
 import sock from 'socket.io'
 
+import { getAllChannels } from './irc_connection'
 import ClientSession from './client_session'
 
 const app = express()
@@ -27,6 +28,7 @@ io.on('connection', sock => {
     sock.emit('message', msg)
   })
 
+  sock.emit('welcome', { channels: getAllChannels()})
   sock.emit('channel-switched', session.getInitialState())
 })
 

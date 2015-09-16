@@ -15,7 +15,9 @@ export default class Messages extends React.Component {
     })
 
     this.props.sock.on('message', msg => {
-      this.setState({ lines: R.append(msg, this.state.lines )})
+      const lines = R.append(msg, this.state.lines)
+      const newState = R.assoc('lines', lines, this.state)
+      this.setState(newState)
     })
   }
 

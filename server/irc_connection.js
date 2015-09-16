@@ -50,3 +50,15 @@ export function getServerConnection(server) {
   else
     return R.find(srv => srv.server == server, servers)
 }
+
+export function getAllChannels() {
+  const chans = R.map(srv => {
+    const createChan = R.pipe(
+      R.createMapEntry('channel'),
+      R.assoc('server', srv.server)
+    )
+    return R.map(createChan, srv._client.opt.channels)
+  }, servers)
+
+  return R.flatten(chans)
+}
