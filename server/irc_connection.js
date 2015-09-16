@@ -33,7 +33,7 @@ class Server extends EventEmitter {
       time: new Date(),
       key: uuid.v4(),
       server: server,
-      nick: from,
+      user: from,
       to: to,
       msg: msg
     }
