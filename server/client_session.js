@@ -30,18 +30,22 @@ export default class ClientSession extends EventEmitter {
   }
 
   _setupChannelEventlEmitters() {
-    const channelMsgListener = msg => {
+    const channelMessageListener = msg => {
       if (msg.to === this.channel)
         this.emit('message', msg)
     }
 
-    this.server.on('message', channelMsgListener)
-    return [{ type: 'message', cb: channelMsgListener }]
+    const listeners = [
+      { type: 'message', callback: channelMessageListener }
+    ]
+    R.forEach(l => this.server.on(l.type, l.callback), listeners)
+
+    return listeners
   }
 
   _removeChannelEventListeners() {
     R.forEach(listener => {
-      this.server.removeListener(listener.type, listener.cb)
+      this.server.removeListener(listener.type, listener.callback)
     }, this.channelListeners)
   }
 }
