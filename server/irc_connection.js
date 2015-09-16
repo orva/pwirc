@@ -1,6 +1,7 @@
 import EventEmitter from 'events'
 import R from 'ramda'
 import irc from 'irc'
+import uuid from 'uuid'
 
 /* TODO list
 - (multiple servers)
@@ -49,7 +50,6 @@ class ClientSession extends EventEmitter {
     }
 
     this.client.on('message', channelMsgListener)
-
     return [{ type: 'message', cb: channelMsgListener }]
   }
 
@@ -85,6 +85,7 @@ function setupClient() {
 function createMessageObject(server, from, to, msg) {
   return {
     time: new Date(),
+    key: uuid.v4(),
     server: server,
     nick: from,
     to: to,
