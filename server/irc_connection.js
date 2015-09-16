@@ -13,16 +13,20 @@ import uuid from 'uuid'
 
 const messages = []
 const server = 'chat.freenode.net'
-const channel = '#nirc-testing'
+const channels = ['#nirc-testing-1', '#nirc-testing-2']
 const client = setupClient()
+
+export function createClientSession() {
+  return new ClientSession()
+}
 
 class ClientSession extends EventEmitter {
   constructor() {
     super()
     this.client = client
-    this.channel = channel
+    this.channel = R.head(channels)
     this.server = server
-    this.messages = messages
+    this.messages = R.filter(msg => msg.to === this.channel, messages)
     this.channelListeners = this._setupChannelEventlEmitters()
   }
 
@@ -38,6 +42,16 @@ class ClientSession extends EventEmitter {
 
   getInitialState() {
     return { lines: this.messages }
+  }
+
+  switchChannel(channel) {
+    if (R.contains(channel, this.client.opt.channels)) {
+      this._removeChannelEventListeners()
+      this.channel = channel
+      this.messages = R.filter(msg => msg.to === this.channel, messages)
+      this._setupChannelEventlEmitters()
+      return this.getInitialState()
+    }
   }
 
   _setupChannelEventlEmitters() {
@@ -60,13 +74,9 @@ class ClientSession extends EventEmitter {
   }
 }
 
-export function createClientSession() {
-  return new ClientSession()
-}
-
 function setupClient() {
   const client = new irc.Client(server, 'nirc-test-user', {
-    channels: [channel]
+    channels: channels
   })
 
   client.addListener('error', err => {

@@ -18,11 +18,16 @@ io.on('connection', sock => {
     session.close()
   })
 
+  sock.on('switch', channel => {
+    const state = session.switchChannel(channel)
+    sock.emit('channel-switched', state)
+  })
+
   session.on('message', msg => {
     sock.emit('message', msg)
   })
 
-  sock.emit('welcome', session.getInitialState())
+  sock.emit('channel-switched', session.getInitialState())
 })
 
 server.listen(31337, () => {

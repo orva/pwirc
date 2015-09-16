@@ -10,7 +10,7 @@ export default class Messages extends React.Component {
   }
 
   componentDidMount = () => {
-    this.props.sock.on('welcome', data => {
+    this.props.sock.on('channel-switched', data => {
       this.setState({ lines: data.lines })
     })
 
@@ -20,8 +20,21 @@ export default class Messages extends React.Component {
   }
 
   render = () => {
+    const sock = this.props.sock
+    const switcher = chan => {
+      return () => sock.emit('switch', chan)
+    }
+    const toChan1 = switcher('#nirc-testing-1')
+    const toChan2 = switcher('#nirc-testing-2')
     const messages = R.map(this.createLineDOM, this.state.lines)
-    return <ul id="messages">{messages}</ul>
+
+    return (
+      <div>
+        <button onClick={toChan1}>chan1</button>
+        <button onClick={toChan2}>chan2</button>
+        <ul id="messages">{messages}</ul>
+      </div>
+    )
   }
 
   createLineDOM = (line) => {
