@@ -14,15 +14,12 @@ export default class ClientSession extends EventEmitter {
   close() {
     this._removeChannelEventListeners()
     this.channelListeners = undefined
-    this.server = undefined
     this.channel = undefined
-    console.log('session closed')
+    this.server = undefined
   }
 
   getInitialState() {
-    const allMessages = this.server.messages
-    const messages = R.filter(msg => msg.to === this.channel, allMessages)
-    return { lines: messages }
+    return { lines: this.server.messages(this.channel) }
   }
 
   switchChannel(channel) {

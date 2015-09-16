@@ -8,12 +8,16 @@ class Server extends EventEmitter {
   constructor(server, nick, opt) {
     super()
     this.server = server
-    this.messages = []
+    this._messages = []
     this._client = new irc.Client(server, nick, opt)
     this._setupServerEventListeners()
   }
 
   get channels() { return this._client.opt.channels }
+
+  messages(channel) {
+    return R.filter(msg => msg.to === channel, this._messages)
+  }
 
   _setupServerEventListeners() {
     this._client.addListener('error', err => {
@@ -22,7 +26,7 @@ class Server extends EventEmitter {
 
     this._client.addListener('message', (from, to, msg) => {
       const message = this._createMessageObject(this.server, from, to, msg)
-      this.messages.push(message)
+      this._messages.push(message)
       this.emit('message', message)
       console.log('message', message)
     })
