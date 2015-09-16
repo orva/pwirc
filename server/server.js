@@ -3,7 +3,7 @@ import http from 'http'
 import express from 'express'
 import sock from 'socket.io'
 
-import * as irc from './irc_connection'
+import ClientSession from './client_session'
 
 const app = express()
 const server = http.Server(app)
@@ -12,7 +12,7 @@ const io = sock(server)
 app.use(express.static(path.join(__dirname, '../dist')))
 
 io.on('connection', sock => {
-  const session = irc.createClientSession()
+  const session = new ClientSession()
 
   sock.on('disconnect', () => {
     session.close()
