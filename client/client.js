@@ -1,14 +1,15 @@
+import io from 'socket.io-client'
 import React from 'react'
+
 import Messages from './messages.jsx'
 import Channels from './channels.jsx'
-import io from 'socket.io-client'
+import App from './app.jsx'
 
 const sock = io.connect()
+const appProps = {
+  sidepanel: React.createElement(Channels, { sock: sock }),
+  content: React.createElement(Messages, { sock: sock })
+}
 
-const chanArea = document.getElementById('channel-area')
-const channels = React.createElement(Channels, { sock: sock })
-React.render(channels, chanArea)
-
-const msgArea = document.getElementById('message-area')
-const messages = React.createElement(Messages, { sock: sock })
-React.render(messages, msgArea)
+const app = React.createElement(App, appProps)
+React.render(app, document.getElementById('app'))
