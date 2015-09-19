@@ -2,8 +2,8 @@ import React from 'react'
 import R from 'ramda'
 
 export default class Channels extends React.Component {
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
     this.state = { channels: [] }
   }
 
@@ -23,8 +23,15 @@ export default class Channels extends React.Component {
     const key = ch.channel + '@' + ch.server
     return (
       <li key={key} className="channel">
-        {ch.channel}
+        <a onClick={this.handleChannelClick} data-channel={ch.channel}>
+          {ch.channel}
+        </a>
       </li>
     )
+  }
+
+  handleChannelClick = (ev) => {
+    const ch = ev.target.dataset.channel
+    this.props.sock.emit('switch', ch)
   }
 }
