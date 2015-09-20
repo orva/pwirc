@@ -1,3 +1,11 @@
+html {
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
 html, body {
   width: 100%;
   max-width: 100%;
@@ -36,9 +44,11 @@ html, body {
 }
 
 #content {
+  height: 100%;
+  max-height: 100%;
+
   width: calc(100% - 15em);
   max-width: calc(100% - 15em);
-  overflow-y: auto;
 
   color: #212121;
 }

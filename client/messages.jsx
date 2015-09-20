@@ -1,6 +1,7 @@
 import React from 'react'
 import R from 'ramda'
 
+import MessageInput from './message_input.jsx'
 import './messages.css'
 
 export default class Messages extends React.Component {
@@ -25,16 +26,19 @@ export default class Messages extends React.Component {
     const messages = R.map(this.createLineDOM, this.state.lines)
 
     return (
-      <ul id="messages">{messages}</ul>
+      <div id='messages-wrapper'>
+        <ul id='messages'>{messages}</ul>
+        <MessageInput></MessageInput>
+      </div>
     )
   }
 
   createLineDOM = (line) => {
     return (
-      <li key={line.key} className="line">
-        <span className="time">{this.formatTimestamp(line.time)}</span>
-        <span className="nick">{line.user}:</span>
-        <span className="msg">{line.msg}</span>
+      <li key={line.key} className='line'>
+        <span className='time'>{this.formatTimestamp(line.time)}</span>
+        <span className='nick'>{line.user}:</span>
+        <span className='msg'>{line.msg}</span>
       </li>
     )
   }
