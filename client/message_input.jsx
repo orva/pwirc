@@ -10,8 +10,7 @@ export default class MessageInput extends React.Component {
       <div id='message-input-box'>
         <input id='message-input' type='text'
           onKeyDown={this.handleKeyDown}
-          onSubmit={this.handleSubmit}>
-        </input>
+          onSubmit={this.handleSubmit} />
       </div>
     )
 }
