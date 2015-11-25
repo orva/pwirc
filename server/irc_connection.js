@@ -16,7 +16,10 @@ class Server extends EventEmitter {
   get channels() { return this._client.opt.channels }
 
   messages(channel) {
-    return R.filter(msg => msg.to === channel, this._messages)
+    // return R.filter(msg => msg.to === channel, this._messages)
+    return R.times(() => {
+      return this._createMessageObject('chat.freenode.net', 'banana', channel, 'laaaalaaaalaaaalaaa')
+    }, 300)
   }
 
   _setupServerEventListeners() {

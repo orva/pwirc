@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default class MessageInput extends React.Component {
+class MessageInput extends React.Component {
   constructor(props) {
     super(props)
   }
@@ -27,3 +27,5 @@ export default class MessageInput extends React.Component {
       this.handleSubmit()
   }
 }
+
+export default MessageInput
