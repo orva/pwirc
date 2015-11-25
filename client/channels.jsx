@@ -1,7 +1,7 @@
 import React from 'react'
 import R from 'ramda'
 
-class Channels extends React.Component {
+export default class Channels extends React.Component {
   constructor(props) {
     super(props)
     this.state = { channels: [] }
@@ -35,5 +35,3 @@ class Channels extends React.Component {
     this.props.sock.emit('switch', ch)
   }
 }
-
-export default Channels

@@ -4,7 +4,7 @@ import R from 'ramda'
 import MessageInput from './message_input.jsx'
 import './messages.css'
 
-class Messages extends React.Component {
+export default class Messages extends React.Component {
   constructor(props) {
     super(props)
     this.state = { lines: [] }
@@ -53,4 +53,3 @@ class Messages extends React.Component {
     return hourStr + ':' + minStr
   }
 }
-export default Messages

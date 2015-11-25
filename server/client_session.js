@@ -3,7 +3,7 @@ import R from 'ramda'
 
 import * as irc from './irc_connection'
 
-class ClientSession extends EventEmitter {
+export default class ClientSession extends EventEmitter {
   constructor() {
     super()
     this.server = irc.getServerConnection()
@@ -49,5 +49,3 @@ class ClientSession extends EventEmitter {
     }, this.channelListeners)
   }
 }
-
-export default ClientSession
