@@ -10,10 +10,14 @@ export default class App extends React.Component {
   render = () => {
     const sidepanelComponent = this.props.sidepanel
     const contentComponent = this.props.content
+    const joinComponent = this.props.join
     return (
       <div id="sidepanel-view">
         <div id="sidepanel">{sidepanelComponent}</div>
         <div id="content">{contentComponent}</div>
+        <div id="popups">
+          {joinComponent}
+        </div>
       </div>
     )
   }
