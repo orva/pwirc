@@ -6,19 +6,15 @@ import Channels from './channels.jsx'
 
 import './app.css'
 
-export default class App extends React.Component {
-  constructor(props) {
-    super(props)
-  }
-
-  openPopup = (title, content) => {
+export default React.createClass({
+  openPopup: function(title, content) {
     Popup.create({
       title: title,
       content: content
     })
-  }
+  },
 
-  render = () => {
+  render: function() {
     const content = React.createElement(Messages, { sock: this.props.sock })
     const sidepanel = React.createElement(Channels, {
       sock: this.props.sock,
@@ -33,4 +29,4 @@ export default class App extends React.Component {
       </div>
     )
   }
-}
+})

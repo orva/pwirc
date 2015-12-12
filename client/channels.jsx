@@ -5,13 +5,12 @@ import JoinDialogue from './join_dialogue.jsx'
 
 import './channels.css'
 
-export default class Channels extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = { channels: [] }
-  }
+export default React.createClass({
+  getInitialState: function() {
+    return { channels: [] }
+  },
 
-  componentDidMount = () => {
+  componentDidMount: function() {
     this.props.sock.on('welcome', data => {
       const newState = R.assoc('channels', data.channels, this.state)
       this.setState(newState)
@@ -22,14 +21,14 @@ export default class Channels extends React.Component {
       const newState = R.assoc('channels', data.channels, this.state)
       this.setState(newState)
     })
-  }
+  },
 
-  openJoin = () => {
+  openJoin: function() {
     const join = <JoinDialogue sock={this.props.sock} />
     this.props.openPopup('Join channel', join)
-  }
+  },
 
-  render = () => {
+  render: function() {
     const chans = R.map(this.createChannelDOM, this.state.channels)
 
     return (
@@ -40,9 +39,9 @@ export default class Channels extends React.Component {
         </div>
       </div>
     )
-  }
+  },
 
-  createChannelDOM = (ch) => {
+  createChannelDOM: function(ch) {
     const key = ch.channel + '@' + ch.server
     return (
       <li key={key} className="channel">
@@ -51,10 +50,10 @@ export default class Channels extends React.Component {
         </a>
       </li>
     )
-  }
+  },
 
-  handleChannelClick = (ev) => {
+  handleChannelClick: function(ev) {
     const ch = ev.target.dataset.channel
     this.props.sock.emit('switch', ch)
   }
-}
+})

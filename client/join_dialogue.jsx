@@ -1,12 +1,8 @@
 import React from 'react'
 import Popup from 'react-popup'
 
-export default class JoinDialogue extends React.Component {
-  constructor(props) {
-    super(props)
-  }
-
-  render = () => {
+export default React.createClass({
+  render: function() {
     return (
       <div id="join-dialogue">
         <input type="text" id="join-dialogue-server"></input>
@@ -14,9 +10,9 @@ export default class JoinDialogue extends React.Component {
         <button type="button" onClick={this.handleJoinClick}>join</button>
       </div>
     )
-  }
+  },
 
-  handleJoinClick = () => {
+  handleJoinClick: function() {
     const serverInput = document.getElementById('join-dialogue-server')
     const channelInput = document.getElementById('join-dialogue-channel')
     const server = serverInput.value
@@ -27,4 +23,4 @@ export default class JoinDialogue extends React.Component {
     this.props.sock.emit('join', server, channel)
     Popup.close()
   }
-}
+})

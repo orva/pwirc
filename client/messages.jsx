@@ -4,13 +4,12 @@ import R from 'ramda'
 import MessageInput from './message_input.jsx'
 import './messages.css'
 
-export default class Messages extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = { lines: [] }
-  }
+export default React.createClass({
+  getInitialState: function() {
+    return { lines: [] }
+  },
 
-  componentDidMount = () => {
+  componentDidMount: function() {
     this.props.sock.on('channel-switched', data => {
       this.setState({ lines: data.lines })
     })
@@ -20,9 +19,9 @@ export default class Messages extends React.Component {
       const newState = R.assoc('lines', lines, this.state)
       this.setState(newState)
     })
-  }
+  },
 
-  render = () => {
+  render: function() {
     const messages = R.map(this.createLineDOM, this.state.lines)
 
     return (
@@ -31,9 +30,9 @@ export default class Messages extends React.Component {
         <MessageInput sock={this.props.sock}></MessageInput>
       </div>
     )
-  }
+  },
 
-  createLineDOM = (line) => {
+  createLineDOM: function(line) {
     return (
       <li key={line.key} className='line'>
         <span className='time'>{this.formatTimestamp(line.time)}</span>
@@ -41,9 +40,9 @@ export default class Messages extends React.Component {
         <span className='msg'>{line.msg}</span>
       </li>
     )
-  }
+  },
 
-  formatTimestamp = (datestr) => {
+  formatTimestamp: function(datestr) {
     const date = new Date(datestr)
     const hours = date.getHours()
     const mins = date.getMinutes()
@@ -52,4 +51,4 @@ export default class Messages extends React.Component {
 
     return hourStr + ':' + minStr
   }
-}
+})
