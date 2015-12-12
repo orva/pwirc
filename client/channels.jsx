@@ -16,10 +16,16 @@ export default class Channels extends React.Component {
       const newState = R.assoc('channels', data.channels, this.state)
       this.setState(newState)
     })
+
+    this.props.sock.on('channel-joined', data => {
+      console.log('channel-joined', data)
+      const newState = R.assoc('channels', data.channels, this.state)
+      this.setState(newState)
+    })
   }
 
   openJoin = () => {
-    const join = <JoinDialogue/>
+    const join = <JoinDialogue sock={this.props.sock} />
     this.props.openPopup('Join channel', join)
   }
 

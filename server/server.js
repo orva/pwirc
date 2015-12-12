@@ -3,7 +3,7 @@ import http from 'http'
 import express from 'express'
 import sock from 'socket.io'
 
-import { getAllChannels } from './irc_connection'
+import * as connection from './irc_connection'
 import ClientSession from './client_session'
 
 const app = express()
@@ -24,11 +24,21 @@ io.on('connection', sock => {
     sock.emit('channel-switched', state)
   })
 
+  sock.on('join', (serverUrl, channel) => {
+    console.log('join', serverUrl, channel)
+    const srv = connection.getServerConnection(serverUrl)
+
+    // TODO how to inform client about error?
+    connection.join(srv, channel, function() {
+      sock.emit('channel-joined', { channels: connection.getAllChannels() })
+    })
+  })
+
   session.on('message', msg => {
     sock.emit('message', msg)
   })
 
-  sock.emit('welcome', { channels: getAllChannels()})
+  sock.emit('welcome', { channels: connection.getAllChannels() })
   sock.emit('channel-switched', session.getInitialState())
 })
 

@@ -4,6 +4,38 @@ import R from 'ramda'
 import irc from 'irc'
 import uuid from 'uuid'
 
+export function getServerConnection(serverUrl) {
+  if (!serverUrl)
+    return R.head(servers)
+  else
+    return R.find(srv => srv.serverUrl === serverUrl, servers)
+}
+
+export function getAllChannels() {
+  const chans = R.map(srv => {
+    const createChan = R.pipe(
+      R.createMapEntry('channel'),
+      R.assoc('server', srv.serverUrl)
+    )
+    return R.map(createChan, srv.client.opt.channels)
+  }, servers)
+
+  return R.flatten(chans)
+}
+
+export function join(server, channel, cb) {
+  if (!server || !channel) {
+    return
+  }
+
+  const existingChans = server.channels
+  if (R.contains(channel, existingChans)) {
+    return
+  }
+
+  server.client.join(channel, cb)
+}
+
 class Server extends EventEmitter {
   constructor(serverUrl, nick, opt) {
     super()
@@ -26,26 +58,6 @@ class Server extends EventEmitter {
 var servers = [
   new Server('chat.freenode.net', 'nirc-test-user', { channels: ['#nirc-testing-1', '#nirc-testing-2'] })
 ]
-
-export function getServerConnection(serverUrl) {
-  if (!serverUrl)
-    return R.head(servers)
-  else
-    return R.find(srv => srv.serverUrl === serverUrl, servers)
-}
-
-export function getAllChannels() {
-  const chans = R.map(srv => {
-    const createChan = R.pipe(
-      R.createMapEntry('channel'),
-      R.assoc('server', srv.serverUrl)
-    )
-    return R.map(createChan, srv.client.opt.channels)
-  }, servers)
-
-  return R.flatten(chans)
-}
-
 
 function setupServerEventListeners(server) {
   server.client.addListener('error', err => {

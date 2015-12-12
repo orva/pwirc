@@ -28,7 +28,6 @@ export default class ClientSession extends EventEmitter {
       return this.getInitialState()
     }
   }
-
 }
 
 function setupChannelEventlEmitters(session) {
