@@ -5,6 +5,15 @@ export default class MessageInput extends React.Component {
     super(props)
   }
 
+  componentDidMount = () => {
+    this.props.sock.on('channel-switched', data => {
+      this.setState({
+        server: data.server,
+        channel: data.channel
+      })
+    })
+  }
+
   render = () => {
     return (
       <div id='message-input-box'>
@@ -19,7 +28,8 @@ export default class MessageInput extends React.Component {
     const form = document.getElementById('message-input')
     const msg = form.value
     form.value = ''
-    console.log('input:', msg)
+    this.props.sock.emit('send-message', this.state.server, this.state.channel, msg)
+    console.info('sent message:', this.state.server, this.state.channel, msg)
   }
 
   handleKeyDown = (ev) => {

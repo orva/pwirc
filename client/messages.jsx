@@ -28,7 +28,7 @@ export default class Messages extends React.Component {
     return (
       <div id='messages-wrapper'>
         <ul id='messages'>{messages}</ul>
-        <MessageInput></MessageInput>
+        <MessageInput sock={this.props.sock}></MessageInput>
       </div>
     )
   }

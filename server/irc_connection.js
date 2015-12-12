@@ -36,6 +36,13 @@ export function join(server, channel, cb) {
   server.client.join(channel, cb)
 }
 
+export function message(serverUrl, target, msg) {
+  const server = getServerConnection(serverUrl)
+  if (server) {
+    server.client.say(target, msg)
+  }
+}
+
 class Server extends EventEmitter {
   constructor(serverUrl, nick, opt) {
     super()
@@ -48,10 +55,10 @@ class Server extends EventEmitter {
   get channels() { return this.client.opt.channels }
 
   messages(channel) {
-    // return R.filter(msg => msg.to === channel, this.allMessages)
-    return R.times(() => {
-      return createMessageObject('chat.freenode.net', 'banana', channel, 'laaaalaaaalaaaalaaa')
-    }, 300)
+    return R.filter(msg => msg.to === channel, this.allMessages)
+    // return R.times(() => {
+    //   return createMessageObject('chat.freenode.net', 'banana', channel, 'laaaalaaaalaaaalaaa')
+    // }, 300)
   }
 }
 
@@ -69,6 +76,14 @@ function setupServerEventListeners(server) {
     server.allMessages.push(message)
     server.emit('message', message)
     console.log('message', message)
+  })
+
+  server.client.addListener('selfMessage', (to, msg) => {
+    const nick = server.client.nick
+    const message = createMessageObject(server.serverUrl, nick, to, msg)
+    server.allMessages.push(message)
+    server.emit('message', message)
+    console.log('selfMessage', message)
   })
 }
 

@@ -19,7 +19,11 @@ export default class ClientSession extends EventEmitter {
   }
 
   getInitialState() {
-    return { lines: this.server.messages(this.channel) }
+    return {
+      lines: this.server.messages(this.channel),
+      server: this.server.serverUrl,
+      channel: this.channel
+    }
   }
 
   switchChannel(channel) {

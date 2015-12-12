@@ -34,6 +34,11 @@ io.on('connection', sock => {
     })
   })
 
+  sock.on('send-message', function(serverUrl, target, msg) {
+    console.info('send-message', serverUrl, target, msg)
+    connection.message(serverUrl, target, msg)
+  })
+
   session.on('message', msg => {
     sock.emit('message', msg)
   })
