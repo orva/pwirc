@@ -8,11 +8,11 @@ export default class ClientSession extends EventEmitter {
     super()
     this.server = irc.getServerConnection()
     this.channel = R.head(this.server.channels)
-    this.channelListeners = this._setupChannelEventlEmitters()
+    this.channelListeners = setupChannelEventlEmitters(this)
   }
 
   close() {
-    this._removeChannelEventListeners()
+    removeChannelEventListeners(this)
     this.channelListeners = undefined
     this.channel = undefined
     this.server = undefined
@@ -29,23 +29,24 @@ export default class ClientSession extends EventEmitter {
     }
   }
 
-  _setupChannelEventlEmitters() {
-    const channelMessageListener = msg => {
-      if (msg.to === this.channel)
-        this.emit('message', msg)
-    }
+}
 
-    const listeners = [
-      { type: 'message', callback: channelMessageListener }
-    ]
-    R.forEach(l => this.server.on(l.type, l.callback), listeners)
-
-    return listeners
+function setupChannelEventlEmitters(session) {
+  const channelMessageListener = msg => {
+    if (msg.to === session.channel)
+    session.emit('message', msg)
   }
 
-  _removeChannelEventListeners() {
-    R.forEach(listener => {
-      this.server.removeListener(listener.type, listener.callback)
-    }, this.channelListeners)
-  }
+  const listeners = [
+    { type: 'message', callback: channelMessageListener }
+  ]
+  R.forEach(l => session.server.on(l.type, l.callback), listeners)
+
+  return listeners
+}
+
+function removeChannelEventListeners(session) {
+  R.forEach(listener => {
+    session.server.removeListener(listener.type, listener.callback)
+  }, session.channelListeners)
 }
