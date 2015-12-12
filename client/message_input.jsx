@@ -1,6 +1,13 @@
 import React from 'react'
 
 export default React.createClass({
+  getInitialState: function() {
+    return {
+      server: '',
+      channel: ''
+    }
+  },
+
   handleSubmit: function() {
     const form = document.getElementById('message-input')
     const msg = form.value
