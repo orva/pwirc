@@ -1,6 +1,10 @@
 import React from 'react'
 import R from 'ramda'
 
+import JoinDialogue from './join_dialogue.jsx'
+
+import './channels.css'
+
 export default class Channels extends React.Component {
   constructor(props) {
     super(props)
@@ -14,9 +18,22 @@ export default class Channels extends React.Component {
     })
   }
 
+  openJoin = () => {
+    const join = <JoinDialogue/>
+    this.props.openPopup('Join channel', join)
+  }
+
   render = () => {
     const chans = R.map(this.createChannelDOM, this.state.channels)
-    return <ul id="channels">{chans}</ul>
+
+    return (
+      <div id="channels">
+        <ul id="channel-list">{chans}</ul>
+        <div id="channel-menu">
+          <button type="button" onClick={this.openJoin}>laalaa</button>
+        </div>
+      </div>
+    )
   }
 
   createChannelDOM = (ch) => {

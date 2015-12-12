@@ -18,14 +18,6 @@
   margin: 0px;
 }
 
-#message-input {
-  width: 100%;
-  height: 2em;
-  padding: 0em 0.7em;
-  color: #212121;
-  border: 1px solid #6b6b6b;
-}
-
 #messages {
   padding: 0em 1em;
   margin: 0px;
@@ -34,7 +26,6 @@
   overflow-y: auto;
   overflow-x: hidden;
 
-  color: #212121;
   list-style: none;
 }
 
