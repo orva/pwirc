@@ -1,11 +1,10 @@
 import EventEmitter from 'events'
 import R from 'ramda'
 
-import * as irc from './irc_connection'
+import * as irc from './irc_server'
 
-export function create() {
-  const server = irc.getServerConnection()
-  const channel = R.head(server.channels)
+export function create(server) {
+  const channel = R.head(server.client.opt.channels)
 
   const session = {
     server: server,
@@ -27,14 +26,14 @@ export function close(session) {
 
 export function initialState(session) {
   return {
-    lines: session.server.messages(session.channel),
+    lines: irc.messages(session.channel, session.server),
     server: session.server.serverUrl,
     channel: session.channel
   }
 }
 
 export function switchChannel(session, channel) {
-  if (R.contains(channel, session.server.channels)) {
+  if (R.contains(channel, irc.channels(session.server))) {
     session.channel = channel
     return initialState(session)
   }
@@ -51,13 +50,13 @@ function setupChannelEventlEmitters(session) {
   const listeners = [
     { type: 'message', callback: channelMessageListener }
   ]
-  R.forEach(l => session.server.on(l.type, l.callback), listeners)
+  R.forEach(l => session.server.events.on(l.type, l.callback), listeners)
 
   return listeners
 }
 
 function removeChannelEventListeners(session) {
   R.forEach(listener => {
-    session.server.removeListener(listener.type, listener.callback)
+    session.server.events.removeListener(listener.type, listener.callback)
   }, session.listeners)
 }
