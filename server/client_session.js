@@ -3,41 +3,49 @@ import R from 'ramda'
 
 import * as irc from './irc_connection'
 
-export default class ClientSession extends EventEmitter {
-  constructor() {
-    super()
-    this.server = irc.getServerConnection()
-    this.channel = R.head(this.server.channels)
-    this.channelListeners = setupChannelEventlEmitters(this)
+export function create() {
+  const server = irc.getServerConnection()
+  const channel = R.head(server.channels)
+
+  const session = {
+    server: server,
+    channel: channel,
+    events: new EventEmitter()
   }
 
-  close() {
-    removeChannelEventListeners(this)
-    this.channelListeners = undefined
-    this.channel = undefined
-    this.server = undefined
-  }
+  const listeners = setupChannelEventlEmitters(session)
+  session.listeners = listeners
+  return session
+}
 
-  getInitialState() {
-    return {
-      lines: this.server.messages(this.channel),
-      server: this.server.serverUrl,
-      channel: this.channel
-    }
-  }
+export function close(session) {
+  removeChannelEventListeners(session)
+  session.listeners = undefined
+  session.channel = undefined
+  session.server = undefined
+}
 
-  switchChannel(channel) {
-    if (R.contains(channel, this.server.channels)) {
-      this.channel = channel
-      return this.getInitialState()
-    }
+export function initialState(session) {
+  return {
+    lines: session.server.messages(session.channel),
+    server: session.server.serverUrl,
+    channel: session.channel
   }
 }
+
+export function switchChannel(session, channel) {
+  if (R.contains(channel, session.server.channels)) {
+    session.channel = channel
+    return initialState(session)
+  }
+}
+
+
 
 function setupChannelEventlEmitters(session) {
   const channelMessageListener = msg => {
     if (msg.to === session.channel)
-    session.emit('message', msg)
+      session.events.emit('message', msg)
   }
 
   const listeners = [
@@ -51,5 +59,5 @@ function setupChannelEventlEmitters(session) {
 function removeChannelEventListeners(session) {
   R.forEach(listener => {
     session.server.removeListener(listener.type, listener.callback)
-  }, session.channelListeners)
+  }, session.listeners)
 }

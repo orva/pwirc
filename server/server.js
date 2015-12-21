@@ -4,7 +4,7 @@ import express from 'express'
 import sock from 'socket.io'
 
 import * as connection from './irc_connection'
-import ClientSession from './client_session'
+import * as client from './client_session'
 
 const app = express()
 const server = http.Server(app)
@@ -13,14 +13,14 @@ const io = sock(server)
 app.use(express.static(path.join(__dirname, '../dist')))
 
 io.on('connection', sock => {
-  const session = new ClientSession()
+  const session = client.create()
 
   sock.on('disconnect', () => {
-    session.close()
+    client.close(session)
   })
 
   sock.on('switch', channel => {
-    const state = session.switchChannel(channel)
+    const state = client.switchChannel(session, channel)
     sock.emit('channel-switched', state)
   })
 
@@ -39,12 +39,12 @@ io.on('connection', sock => {
     connection.message(serverUrl, target, msg)
   })
 
-  session.on('message', msg => {
+  session.events.on('message', msg => {
     sock.emit('message', msg)
   })
 
   sock.emit('welcome', { channels: connection.getAllChannels() })
-  sock.emit('channel-switched', session.getInitialState())
+  sock.emit('channel-switched', client.initialState(session))
 })
 
 server.listen(31337, () => {
