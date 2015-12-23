@@ -1,11 +1,11 @@
 import path from 'path'
 import http from 'http'
 import express from 'express'
-import sock from 'socket.io'
+import SocketIO from 'socket.io'
 import R from 'ramda'
 
 import * as irc from './irc_server'
-import * as client from './client_session'
+import * as channel from './channel_filter'
 
 // TODO: We actually need some kind of manager that wraps all the server
 //       connections, so our client session needs only put listerners to one
@@ -16,30 +16,30 @@ var connectedServers = [
 
 const app = express()
 const httpServer = http.Server(app)
-const io = sock(httpServer)
+const io = SocketIO(httpServer)
 
 app.use(express.static(path.join(__dirname, '../dist')))
 
 io.on('connection', sock => {
-  const session = client.create(R.head(connectedServers))
+  const session = channel.create(R.head(connectedServers))
 
   sock.on('disconnect', () => {
-    client.close(session)
+    channel.close(session)
   })
 
-  sock.on('switch', channel => {
-    const state = client.switchChannel(session, channel)
+  sock.on('switch', chan => {
+    const state = channel.switchChannel(session, chan)
     sock.emit('channel-switched', state)
   })
 
-  sock.on('join', (serverUrl, channel) => {
+  sock.on('join', (serverUrl, chan) => {
     // TODO how to inform client about error?
-    console.log('join', serverUrl, channel)
+    console.log('join', serverUrl, chan)
 
     const srv = findServer(serverUrl)
     if (!srv) return
 
-    irc.join(srv, channel, function() {
+    irc.join(srv, chan, function() {
       sock.emit('channel-joined', { channels: allChannels(connectedServers) })
     })
   })
@@ -55,7 +55,7 @@ io.on('connection', sock => {
   })
 
   sock.emit('welcome', { channels: allChannels(connectedServers) })
-  sock.emit('channel-switched', client.initialState(session))
+  sock.emit('channel-switched', channel.initialState(session))
 })
 
 httpServer.listen(31337, () => {

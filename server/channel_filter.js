@@ -3,6 +3,17 @@ import R from 'ramda'
 
 import * as irc from './irc_server'
 
+/*
+
+We actually want to send only messages to current channel to the client, as it
+might be behind mobile connection. Thus we need to store current channel state
+per client at server side.
+
+This module wraps current channel state and manages adding/removing event
+listeners to correct places.
+
+*/
+
 export function create(server) {
   const channel = R.head(server.client.opt.channels)
 
