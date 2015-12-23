@@ -15,7 +15,7 @@ listeners to correct places.
 */
 
 export function create(server) {
-  const channel = R.head(server.client.opt.channels)
+  const channel = R.head(irc.channels(server))
 
   const session = {
     server: server,
