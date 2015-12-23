@@ -5,7 +5,8 @@
   "rules": {
     "no-console": 0,
     "semi": [2, "never"],
-    "quotes": [2, "single"]
+    "quotes": [2, "single"],
+    "no-shadow": 2
   },
   "env": {
     "node": true,
