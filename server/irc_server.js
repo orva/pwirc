@@ -4,8 +4,9 @@ import R from 'ramda'
 import irc from 'irc'
 import uuid from 'uuid'
 
-export function connect(url, nick, opts) {
+export function connect(name, url, nick, opts) {
   const server = {
+    name: name,
     serverUrl: url,
     allMessages: [],
     client: new irc.Client(url, nick, opts),

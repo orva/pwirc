@@ -12,11 +12,11 @@ function stubbedServer() {
     events: new EventEmitter(),
     serverUrl: 'chat.freenode.net',
     allMessages: [
-      {time: new Date(), key: '1', server: 'chat.freenode.net', user: 'user-1', to: '#first', msg: 'msg1'},
-      {time: new Date(), key: '2', server: 'chat.freenode.net', user: 'user-2', to: '#first', msg: 'msg2'},
-      {time: new Date(), key: '3', server: 'chat.freenode.net', user: 'user-1', to: '#first', msg: 'msg3'},
-      {time: new Date(), key: '4', server: 'chat.freenode.net', user: 'user-1', to: '#second', msg: 'msg4'},
-      {time: new Date(), key: '5', server: 'chat.freenode.net', user: 'user-3', to: '#first', msg: 'msg5'}
+      {time: new Date(), key: '1', name: 'freenode', server: 'chat.freenode.net', user: 'user-1', to: '#first', msg: 'msg1'},
+      {time: new Date(), key: '2', name: 'freenode', server: 'chat.freenode.net', user: 'user-2', to: '#first', msg: 'msg2'},
+      {time: new Date(), key: '3', name: 'freenode', server: 'chat.freenode.net', user: 'user-1', to: '#first', msg: 'msg3'},
+      {time: new Date(), key: '4', name: 'freenode', server: 'chat.freenode.net', user: 'user-1', to: '#second', msg: 'msg4'},
+      {time: new Date(), key: '5', name: 'freenode', server: 'chat.freenode.net', user: 'user-3', to: '#first', msg: 'msg5'}
     ]
   }
 }
@@ -95,8 +95,8 @@ describe('ChannelFilter', () => {
       should.equal(this.state.channel, '#first')
     })
 
-    it('returns object containing current server url', function() {
-      should.equal(this.state.server, this.server.serverUrl)
+    it('returns object containing current server name', function() {
+      should.equal(this.state.server, this.server.name)
     })
 
     it('returns object containing some messages to current channel', function() {
@@ -139,7 +139,7 @@ describe('ChannelFilter', () => {
       server.events.emit('message', msg)
       setTimeout(done, 10)
     })
-    
+
     it('emits "message" if server emits message to current channel', function(done) {
       const server = stubbedServer()
       const c = this.channel.create(server)

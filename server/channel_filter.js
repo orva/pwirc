@@ -38,7 +38,7 @@ export function close(session) {
 export function initialState(session) {
   return {
     lines: irc.messages(session.channel, session.server),
-    server: session.server.serverUrl,
+    server: session.server.name,
     channel: session.channel
   }
 }

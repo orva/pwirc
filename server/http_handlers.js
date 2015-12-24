@@ -11,7 +11,7 @@ import * as channel from './channel_filter'
 //       connections, so our client session needs only put listerners to one
 //       place.
 var connectedServers = [
-  irc.connect('chat.freenode.net', 'nirc-test-user', { channels: ['#nirc-testing-1', '#nirc-testing-2'] })
+  irc.connect('freenode', 'chat.freenode.net', 'nirc-test-user', { channels: ['#nirc-testing-1', '#nirc-testing-2'] })
 ]
 
 const app = express()
@@ -32,11 +32,11 @@ io.on('connection', sock => {
     sock.emit('channel-switched', state)
   })
 
-  sock.on('join', (serverUrl, chan) => {
+  sock.on('join', (serverName, chan) => {
     // TODO how to inform client about error?
-    console.log('join', serverUrl, chan)
+    console.log('join', serverName, chan)
 
-    const srv = findServer(serverUrl)
+    const srv = findServer(serverName)
     if (!srv) return
 
     irc.join(srv, chan, function() {
@@ -44,9 +44,9 @@ io.on('connection', sock => {
     })
   })
 
-  sock.on('send-message', function(serverUrl, target, msg) {
-    console.info('send-message', serverUrl, target, msg)
-    const srv = findServer(serverUrl)
+  sock.on('send-message', function(serverName, target, msg) {
+    console.info('send-message', serverName, target, msg)
+    const srv = findServer(serverName)
     irc.say(target, msg, srv)
   })
 
@@ -62,15 +62,15 @@ httpServer.listen(31337, () => {
   console.log('server started, port 31337')
 })
 
-function findServer(serverUrl) {
-  return R.find(R.propEq('serverUrl', serverUrl), connectedServers)
+function findServer(serverName) {
+  return R.find(R.propEq('name', serverName), connectedServers)
 }
 
 function allChannels(servers) {
   const chans = R.map(srv => {
     const createChan = R.pipe(
       R.createMapEntry('channel'),
-      R.assoc('server', srv.serverUrl)
+      R.assoc('server', srv.name)
     )
     return R.map(createChan, srv.client.opt.channels)
   }, servers)
