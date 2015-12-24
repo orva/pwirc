@@ -1,21 +1,21 @@
 {
-  "name": "nirc",
+  "name": "pwirc",
   "version": "0.0.1",
-  "description": "TODO",
+  "description": "Private web irc client",
+  "author": "Iivari Äikäs",
+  "license": "MIT",
   "main": "server/start.js",
+  "keywords": [
+    "irc",
+    "web",
+    "mobile"
+  ],
   "scripts": {
     "test": "mocha --compilers js:babel-register",
     "start": "node server/start.js",
     "watch": "webpack --watch --debug",
     "lint": "eslint server/*.js client/*.js client/*.jsx"
   },
-  "keywords": [
-    "irc",
-    "web",
-    "mobile"
-  ],
-  "author": "Iivari Äikäs",
-  "license": "MIT",
   "devDependencies": {
     "babel-eslint": "^4.1.6",
     "babel-loader": "^6.2.0",
