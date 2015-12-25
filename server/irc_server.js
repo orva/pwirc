@@ -33,8 +33,7 @@ export function messages(channel, server) {
 }
 
 export function channels(server) {
-  // TODO: use server.client.channels, requires join event handling
-  return server.client.opt.channels
+  return R.keys(server.client.chans)
 }
 
 
@@ -57,6 +56,12 @@ function setupServerEventListeners(server) {
     server.allMessages.push(message)
     server.events.emit('message', message)
     console.log('selfMessage', message)
+  })
+
+  server.client.addListener('join', (chan, nick) => {
+    if (nick === server.client.nick) {
+      server.events.emit('channel-joined', chan)
+    }
   })
 }
 

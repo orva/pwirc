@@ -55,9 +55,7 @@ io.on('connection', sock => {
     const srv = findServer(serverName)
     if (!srv) return
 
-    irc.join(srv, chan, function() {
-      sock.emit('channel-joined', { channels: allChannels(connectedServers) })
-    })
+    irc.join(srv, chan)
   })
 
   session.events.on('message', msg => {
@@ -68,9 +66,17 @@ io.on('connection', sock => {
   sock.emit('channel-switched', channel.initialState(session))
 })
 
+R.forEach(R.curry(serverBroadcasts)(io), connectedServers)
+
 httpServer.listen(31337, () => {
   console.log('server started, port 31337')
 })
+
+function serverBroadcasts(sockIO, server) {
+  server.events.on('channel-joined', () => {
+    sockIO.emit('channel-joined', { channels: allChannels(connectedServers) })
+  })
+}
 
 function findServer(serverName) {
   return R.find(R.propEq('name', serverName), connectedServers)
