@@ -5,21 +5,10 @@ import should from 'should'
 import sinon from 'sinon'
 import proxyquire from 'proxyquire'
 
+import * as stubs from './stubs'
+
 const channelPath = '../server/channel_filter'
 
-function stubbedServer() {
-  return {
-    events: new EventEmitter(),
-    serverUrl: 'chat.freenode.net',
-    allMessages: [
-      {time: new Date(), key: '1', name: 'freenode', server: 'chat.freenode.net', user: 'user-1', to: '#first', msg: 'msg1'},
-      {time: new Date(), key: '2', name: 'freenode', server: 'chat.freenode.net', user: 'user-2', to: '#first', msg: 'msg2'},
-      {time: new Date(), key: '3', name: 'freenode', server: 'chat.freenode.net', user: 'user-1', to: '#first', msg: 'msg3'},
-      {time: new Date(), key: '4', name: 'freenode', server: 'chat.freenode.net', user: 'user-1', to: '#second', msg: 'msg4'},
-      {time: new Date(), key: '5', name: 'freenode', server: 'chat.freenode.net', user: 'user-3', to: '#first', msg: 'msg5'}
-    ]
-  }
-}
 
 describe('ChannelFilter', () => {
   before(function() {
@@ -32,21 +21,21 @@ describe('ChannelFilter', () => {
 
   describe('create', function() {
     it('sets first channel from supplied server as current channel', function() {
-      const c = this.channel.create(stubbedServer())
+      const c = this.channel.create(stubs.server())
 
       should.ok(this.ircStub.channels.called)
       should.equal(c.channel, '#first')
     })
 
     it('stores provided server', function() {
-      const server = stubbedServer()
+      const server = stubs.server()
       const c = this.channel.create(server)
 
       should.equal(c.server, server)
     })
 
     it('stores event listeners added to server.events', function() {
-      const server = stubbedServer()
+      const server = stubs.server()
       const c = this.channel.create(server)
 
       R.isEmpty(c.listeners).should.be.false
@@ -61,7 +50,7 @@ describe('ChannelFilter', () => {
 
   describe('close', function() {
     it('removes event listeners added to server.events', function() {
-      const server = stubbedServer()
+      const server = stubs.server()
       const c = this.channel.create(server)
       const listeners = c.listeners
       this.channel.close(c)
@@ -72,13 +61,13 @@ describe('ChannelFilter', () => {
     })
 
     it('removes stored server', function() {
-      const c = this.channel.create(stubbedServer())
+      const c = this.channel.create(stubs.server())
       this.channel.close(c)
       should.not.exist(c.server)
     })
 
     it('removes current channel', function() {
-      const c = this.channel.create(stubbedServer())
+      const c = this.channel.create(stubs.server())
       this.channel.close(c)
       should.not.exist(c.channel)
     })
@@ -86,7 +75,7 @@ describe('ChannelFilter', () => {
 
   describe('initialState', function() {
     before(function() {
-      this.server = stubbedServer()
+      this.server = stubs.server()
       this.session = this.channel.create(this.server)
       this.state = this.channel.initialState(this.session)
     })
@@ -107,18 +96,18 @@ describe('ChannelFilter', () => {
 
   describe('switchChannel', function() {
     it('changes current channel', function() {
-      const c = this.channel.create(stubbedServer())
+      const c = this.channel.create(stubs.server())
       should.ok(this.channel.switchChannel(c, '#second'))
       should.equal(c.channel, '#second')
     })
 
     it('fails if server does not have provided channel', function() {
-      const c = this.channel.create(stubbedServer())
+      const c = this.channel.create(stubs.server())
       should.not.exist(this.channel.switchChannel(c, '#does_not_exist'))
     })
 
     it('returns ChannelFilter.initialState for new channel', function() {
-      const c = this.channel.create(stubbedServer())
+      const c = this.channel.create(stubs.server())
       const ret = this.channel.switchChannel(c, '#second')
       should.deepEqual(ret, this.channel.initialState(c))
     })
@@ -126,7 +115,7 @@ describe('ChannelFilter', () => {
 
   describe('events', function() {
     it('does not emit "message" if server emits message not current channel', function(done) {
-      const server = stubbedServer()
+      const server = stubs.server()
       const c = this.channel.create(server)
       this.channel.switchChannel(c, '#first')
 
@@ -141,7 +130,7 @@ describe('ChannelFilter', () => {
     })
 
     it('emits "message" if server emits message to current channel', function(done) {
-      const server = stubbedServer()
+      const server = stubs.server()
       const c = this.channel.create(server)
       this.channel.switchChannel(c, '#first')
 
