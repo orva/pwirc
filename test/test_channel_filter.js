@@ -1,4 +1,3 @@
-import EventEmitter from 'events'
 import R from 'ramda'
 
 import should from 'should'
