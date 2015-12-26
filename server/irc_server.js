@@ -36,6 +36,13 @@ export function channels(server) {
   return R.keys(server.client.chans)
 }
 
+export function isChannelName(server, name) {
+  const chanPrefixes = R.split('', server.client.supported.channel.types)
+  const escaper = R.map(pref => '\\' + pref)
+  const escapedChanPrefixes = R.join('', escaper(chanPrefixes))
+  const regex = new RegExp('[' + escapedChanPrefixes + '].+')
+  return regex.test(name)
+}
 
 
 function setupServerEventListeners(server) {

@@ -25,13 +25,24 @@ app.use(express.static(path.join(__dirname, '../dist')))
 app.use(bodyParser.json())
 
 app.post('/messages/:server/:to', (req, res) => {
-  if (!req.params.server || !req.params.to || !req.body ||
-      typeof req.body !== 'object' || !req.body.msg) {
+  if (!req.params.server || !req.params.to ||
+      !req.body || typeof req.body !== 'object' || !req.body.msg) {
     res.status(404).end()
     return
   }
 
   const server = findServer(req.params.server)
+  if (!server) {
+    res.status(404).end()
+    return
+  }
+
+  if (irc.isChannelName(server, req.params.to) &&
+      !R.contains(req.params.to, irc.channels(server))) {
+    res.status(404).end()
+    return
+  }
+
   irc.say(req.params.to, req.body.msg, server)
   res.status(200).end()
 })
