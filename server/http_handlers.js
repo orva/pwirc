@@ -47,6 +47,28 @@ app.post('/messages/:server/:to', (req, res) => {
   res.status(200).end()
 })
 
+app.post('/channels/:server/:chan', (req, res) => {
+  if (!req.params.server || !req.params.chan) {
+    res.status(404).end()
+    return
+  }
+
+  const server = findServer(req.params.server)
+  if (!server) {
+    res.status(404).end()
+    return
+  }
+
+  if (!irc.isChannelName(server, req.params.chan) ||
+      R.contains(req.params.chan, irc.channels(server))) {
+    res.status(404).end()
+    return
+  }
+
+  irc.join(server, req.params.chan)
+  res.status(200).end()
+})
+
 io.on('connection', sock => {
   const session = channel.create(R.head(connectedServers))
 
@@ -57,16 +79,6 @@ io.on('connection', sock => {
   sock.on('switch', chan => {
     const state = channel.switchChannel(session, chan)
     sock.emit('channel-switched', state)
-  })
-
-  sock.on('join', (serverName, chan) => {
-    // TODO how to inform client about error?
-    console.log('join', serverName, chan)
-
-    const srv = findServer(serverName)
-    if (!srv) return
-
-    irc.join(srv, chan)
   })
 
   session.events.on('message', msg => {

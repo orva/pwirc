@@ -7,20 +7,23 @@ export default React.createClass({
       <div id="join-dialogue">
         <input type="text" id="join-dialogue-server"></input>
         <input type="text" id="join-dialogue-channel"></input>
-        <button type="button" onClick={this.handleJoinClick}>join</button>
+        <button type="button" onClick={handleJoinClick}>join</button>
       </div>
     )
-  },
-
-  handleJoinClick: function() {
-    const serverInput = document.getElementById('join-dialogue-server')
-    const channelInput = document.getElementById('join-dialogue-channel')
-    const server = serverInput.value
-    const channel = channelInput.value
-
-    serverInput.value = ''
-    channelInput.value = ''
-    this.props.sock.emit('join', server, channel)
-    Popup.close()
   }
 })
+
+function handleJoinClick() {
+  const serverInput = document.getElementById('join-dialogue-server')
+  const channelInput = document.getElementById('join-dialogue-channel')
+  const server = encodeURIComponent(serverInput.value)
+  const channel = encodeURIComponent(channelInput.value)
+  const uri = '/channels/' + server + '/' + channel
+
+  fetch(uri, { method: 'post' })
+    .then(() => {
+      serverInput.value = ''
+      channelInput.value = ''
+      Popup.close()
+    })
+  }
