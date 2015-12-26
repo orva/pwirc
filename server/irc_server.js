@@ -9,7 +9,7 @@ export function connect(name, url, nick, opts) {
     name: name,
     serverUrl: url,
     allMessages: [],
-    client: new irc.Client(url, nick, opts),
+    irc: new irc.Client(url, nick, opts),
     events: new EventEmitter()
   }
   setupServerEventListeners(server)
@@ -21,11 +21,11 @@ export function join(server, channel, cb) {
     return
   }
 
-  server.client.join(channel, cb)
+  server.irc.join(channel, cb)
 }
 
 export function say(target, msg, server) {
-  server.client.say(target, msg)
+  server.irc.say(target, msg)
 }
 
 export function messages(channel, server) {
@@ -33,11 +33,11 @@ export function messages(channel, server) {
 }
 
 export function channels(server) {
-  return R.keys(server.client.chans)
+  return R.keys(server.irc.chans)
 }
 
 export function isChannelName(server, name) {
-  const chanPrefixes = R.split('', server.client.supported.channel.types)
+  const chanPrefixes = R.split('', server.irc.supported.channel.types)
   const escaper = R.map(pref => '\\' + pref)
   const escapedChanPrefixes = R.join('', escaper(chanPrefixes))
   const regex = new RegExp('[' + escapedChanPrefixes + '].+')
@@ -46,27 +46,27 @@ export function isChannelName(server, name) {
 
 
 function setupServerEventListeners(server) {
-  server.client.addListener('error', err => {
+  server.irc.addListener('error', err => {
     console.log('error', err)
   })
 
-  server.client.addListener('message', (from, to, msg) => {
+  server.irc.addListener('message', (from, to, msg) => {
     const message = createMessageObject(server.serverUrl, from, to, msg)
     server.allMessages.push(message)
     server.events.emit('message', message)
     console.log('message', message)
   })
 
-  server.client.addListener('selfMessage', (to, msg) => {
-    const nick = server.client.nick
+  server.irc.addListener('selfMessage', (to, msg) => {
+    const nick = server.irc.nick
     const message = createMessageObject(server.serverUrl, nick, to, msg)
     server.allMessages.push(message)
     server.events.emit('message', message)
     console.log('selfMessage', message)
   })
 
-  server.client.addListener('join', (chan, nick) => {
-    if (nick === server.client.nick) {
+  server.irc.addListener('join', (chan, nick) => {
+    if (nick === server.irc.nick) {
       server.events.emit('channel-joined', chan)
     }
   })
