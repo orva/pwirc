@@ -24,7 +24,7 @@ export default React.createClass({
   },
 
   openJoin: function() {
-    const join = <JoinDialogue sock={this.props.sock} />
+    const join = <JoinDialogue />
     this.props.openPopup('Join channel', join)
   },
 
