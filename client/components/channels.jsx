@@ -11,8 +11,8 @@ export default React.createClass({
   },
 
   componentDidMount: function() {
-    this.props.sock.on('welcome', data => {
-      const newState = R.assoc('channels', data.channels, this.state)
+    this.props.sock.on('channels-updated', data => {
+      const newState = R.assoc('channels', data, this.state)
       this.setState(newState)
     })
 
