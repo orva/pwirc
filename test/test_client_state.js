@@ -5,7 +5,7 @@ import * as stubs from './stubs'
 import reducer from '../client/reducers.js'
 import * as actions from '../client/actions.js'
 
-describe('reducers', function() {
+describe('Client state reducers', function() {
   it('has expected initial state', function() {
     const state = reducer(undefined, {})
     should.deepEqual(state, { channels: [], messages: [], currentChannel: {} })
