@@ -1,4 +1,5 @@
 import React from 'react'
+import { connect } from 'react-redux'
 import Popup from 'react-popup'
 
 import Messages from './messages.jsx'
@@ -6,19 +7,19 @@ import Channels from './channels.jsx'
 
 import './app.css'
 
-export default React.createClass({
-  openPopup: function(title, content) {
-    Popup.create({
-      title: title,
-      content: content
-    })
-  },
-
+const App = React.createClass({
   render: function() {
-    const content = React.createElement(Messages, { sock: this.props.sock })
+    const { messages, channels, currentChannel } = this.props
+
+    const content = React.createElement(Messages, {
+      messages: messages,
+      currentChannel: currentChannel
+    })
+
     const sidepanel = React.createElement(Channels, {
-      sock: this.props.sock,
-      openPopup: this.openPopup
+      switchChannel: channelSwitcher(this.props.sock),
+      channels: channels,
+      openPopup: openPopup
     })
 
     return (
@@ -30,3 +31,19 @@ export default React.createClass({
     )
   }
 })
+
+function openPopup(title, content) {
+  Popup.create({
+    title: title,
+    content: content
+  })
+}
+
+function channelSwitcher(sock) {
+  return  (chan) => {
+    sock.emit('switch', chan)
+  }
+}
+
+
+export default connect(state => state)(App)

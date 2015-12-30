@@ -6,30 +6,8 @@ import JoinDialogue from './join_dialogue.jsx'
 import './channels.css'
 
 export default React.createClass({
-  getInitialState: function() {
-    return { channels: [] }
-  },
-
-  componentDidMount: function() {
-    this.props.sock.on('channels-updated', data => {
-      const newState = R.assoc('channels', data, this.state)
-      this.setState(newState)
-    })
-
-    this.props.sock.on('channel-joined', data => {
-      console.log('channel-joined', data)
-      const newState = R.assoc('channels', data.channels, this.state)
-      this.setState(newState)
-    })
-  },
-
-  openJoin: function() {
-    const join = <JoinDialogue />
-    this.props.openPopup('Join channel', join)
-  },
-
   render: function() {
-    const chans = R.map(this.createChannelDOM, this.state.channels)
+    const chans = R.map(this.createChannelDOM, this.props.channels)
 
     return (
       <div id="channels">
@@ -39,6 +17,11 @@ export default React.createClass({
         </div>
       </div>
     )
+  },
+
+  openJoin: function() {
+    const join = <JoinDialogue />
+    this.props.openPopup('Join channel', join)
   },
 
   createChannelDOM: function(ch) {
@@ -54,6 +37,6 @@ export default React.createClass({
 
   handleChannelClick: function(ev) {
     const ch = ev.target.dataset.channel
-    this.props.sock.emit('switch', ch)
+    this.props.switchChannel(ch)
   }
 })

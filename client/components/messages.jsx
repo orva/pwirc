@@ -5,31 +5,15 @@ import MessageInput from './message_input.jsx'
 import './messages.css'
 
 export default React.createClass({
-  getInitialState: function() {
-    return { lines: [] }
-  },
-
-  componentDidMount: function() {
-    this.props.sock.on('channel-switched', data => {
-      this.setState({ lines: data.lines })
-    })
-
-    this.props.sock.on('message', msg => {
-      const lines = R.append(msg, this.state.lines)
-      const newState = R.assoc('lines', lines, this.state)
-      this.setState(newState)
-    })
-  },
-
   render: function() {
     const messages = R.map(line =>
       <Line key={line.key} time={line.time} nick={line.user} msg={line.msg}/>,
-      this.state.lines)
+      this.props.messages)
 
     return (
       <div id='messages-wrapper'>
         <ul id='messages'>{messages}</ul>
-        <MessageInput sock={this.props.sock}></MessageInput>
+        <MessageInput currentChannel={this.props.currentChannel}></MessageInput>
       </div>
     )
   }

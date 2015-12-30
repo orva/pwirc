@@ -1,19 +1,12 @@
 import React from 'react'
 
 export default React.createClass({
-  getInitialState: function() {
-    return {
-      server: '',
-      channel: ''
-    }
-  },
-
   handleSubmit: function() {
     const form = document.getElementById('message-input')
     const msg = form.value
+    const to = encodeURIComponent(this.props.currentChannel.channel)
+    const server = encodeURIComponent(this.props.currentChannel.server)
 
-    const to = encodeURIComponent(this.state.channel)
-    const server = encodeURIComponent(this.state.server)
     const uri = '/messages/' + server + '/' + to
     const req = {
       method: 'post',
@@ -36,15 +29,6 @@ export default React.createClass({
   handleKeyDown: function(ev) {
     if (ev.key === 'Enter')
       this.handleSubmit()
-  },
-
-  componentDidMount: function() {
-    this.props.sock.on('channel-switched', data => {
-      this.setState({
-        server: data.server,
-        channel: data.channel
-      })
-    })
   },
 
   render: function() {
