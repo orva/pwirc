@@ -69,6 +69,15 @@ app.post('/channels/:server/:chan', (req, res) => {
   res.status(200).end()
 })
 
+app.get('/channels/:server/:chan', (req, res) => {
+  if (!req.accepts('html')) {
+    res.status(404).end()
+    return
+  }
+
+  res.sendFile(path.join(__dirname, '../dist/index.html'))
+})
+
 io.on('connection', sock => {
   const session = channel.create(R.head(connectedServers))
 
@@ -86,7 +95,7 @@ io.on('connection', sock => {
   })
 
   sock.emit('channels-updated', allChannels(connectedServers))
-  sock.emit('channel-switched', channel.initialState(session))
+  sock.emit('welcome')
 })
 
 R.forEach(R.curry(serverBroadcasts)(io), connectedServers)

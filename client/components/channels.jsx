@@ -26,11 +26,12 @@ export default React.createClass({
 
   createChannelDOM: function(ch) {
     const key = ch.channel + '@' + ch.server
+    const uri = '/channels/' +
+      encodeURIComponent(ch.server) + '/' + encodeURIComponent(ch.channel)
+
     return (
       <li key={key} className="channel">
-        <a onClick={this.handleChannelClick} data-channel={ch.channel}>
-          {ch.channel}
-        </a>
+        <a href={uri} >{ch.channel}</a>
       </li>
     )
   },

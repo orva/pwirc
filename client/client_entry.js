@@ -1,6 +1,7 @@
 // jsx transformations require react to exist with name "React"
 import React from 'react' // eslint-disable-line no-unused-vars
 
+import page from 'page'
 import io from 'socket.io-client'
 import { createStore } from 'redux'
 import { Provider } from 'react-redux'
@@ -13,6 +14,13 @@ import * as actions from './actions'
 const store = createStore(reducers)
 const sock = io.connect()
 
+
+page() // Register page.js pushstate handlers, etc
+page('/channels/:server/:channel', ctx => {
+  sock.emit('switch', ctx.params.channel)
+})
+
+
 sock.on('channel-switched', chan => {
   store.dispatch(actions.switchChannel(chan))
 })
@@ -24,6 +32,21 @@ sock.on('channels-updated', channels => {
 sock.on('message', msg => {
   store.dispatch(actions.receiveMessage(msg))
 })
+
+sock.on('welcome', () => {
+  const path = window.location.pathname
+  const channelPath = /^\/channels\/.+/
+
+  if (channelPath.test(path)) {
+    page(window.location.pathname)
+  } else {
+    const chan = store.getState().channels[0]
+    const uri = '/channels/' + encodeURIComponent(chan.server) + '/' +
+      encodeURIComponent(chan.channel)
+    page(uri)
+  }
+})
+
 
 render(
   <Provider store={store}>
