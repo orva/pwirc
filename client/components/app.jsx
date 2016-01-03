@@ -11,21 +11,16 @@ const App = React.createClass({
   render: function() {
     const { messages, channels, currentChannel } = this.props
 
-    const content = React.createElement(Messages, {
-      messages: messages,
-      currentChannel: currentChannel
-    })
-
-    const sidepanel = React.createElement(Channels, {
-      switchChannel: channelSwitcher(this.props.sock),
-      channels: channels,
-      openPopup: openPopup
-    })
-
     return (
       <div id="sidepanel-view">
-        <div id="sidepanel">{sidepanel}</div>
-        <div id="content">{content}</div>
+        <div id="sidepanel">
+          <Channels switchChannel={channelSwitcher(this.props.sock)}
+            channels={channels}
+            openPopup={openPopup}/>
+        </div>
+        <div id="content">
+          <Messages messages={messages} currentChannel={currentChannel}/>
+        </div>
         <Popup closeBtn={false}/>
       </div>
     )

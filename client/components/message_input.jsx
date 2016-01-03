@@ -1,6 +1,16 @@
 import React from 'react'
 
 export default React.createClass({
+  render: function() {
+    return (
+      <div id='message-input-box'>
+        <input id='message-input' type='text'
+          onKeyDown={this.handleKeyDown}
+          onSubmit={this.handleSubmit} />
+      </div>
+    )
+  },
+
   handleSubmit: function() {
     const form = document.getElementById('message-input')
     const msg = form.value
@@ -29,15 +39,5 @@ export default React.createClass({
   handleKeyDown: function(ev) {
     if (ev.key === 'Enter')
       this.handleSubmit()
-  },
-
-  render: function() {
-    return (
-      <div id='message-input-box'>
-        <input id='message-input' type='text'
-          onKeyDown={this.handleKeyDown}
-          onSubmit={this.handleSubmit} />
-      </div>
-    )
   }
 })

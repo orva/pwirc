@@ -7,7 +7,7 @@ import './channels.css'
 
 export default React.createClass({
   render: function() {
-    const chans = R.map(this.createChannelDOM, this.props.channels)
+    const chans = R.map(Channel, this.props.channels)
 
     return (
       <div id="channels">
@@ -24,20 +24,20 @@ export default React.createClass({
     this.props.openPopup('Join channel', join)
   },
 
-  createChannelDOM: function(ch) {
-    const key = ch.channel + '@' + ch.server
-    const uri = '/channels/' +
-      encodeURIComponent(ch.server) + '/' + encodeURIComponent(ch.channel)
-
-    return (
-      <li key={key} className="channel">
-        <a href={uri} >{ch.channel}</a>
-      </li>
-    )
-  },
-
   handleChannelClick: function(ev) {
     const ch = ev.target.dataset.channel
     this.props.switchChannel(ch)
   }
 })
+
+const Channel = props => {
+  const key = props.channel + '@' + props.server
+  const uri = '/channels/' +
+    encodeURIComponent(props.server) + '/' + encodeURIComponent(props.channel)
+
+  return (
+    <li key={key} className="channel">
+      <a href={uri} >{props.channel}</a>
+    </li>
+  )
+}

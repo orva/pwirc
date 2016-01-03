@@ -6,9 +6,7 @@ import './messages.css'
 
 export default React.createClass({
   render: function() {
-    const messages = R.map(line =>
-      <Line key={line.key} time={line.time} nick={line.user} msg={line.msg}/>,
-      this.props.messages)
+    const messages = R.map(Line, this.props.messages)
 
     return (
       <div id='messages-wrapper'>
@@ -19,22 +17,15 @@ export default React.createClass({
   }
 })
 
-const Line = React.createClass({
-  shouldComponentUpdate: function() {
-    return false
-  },
-
-  render: function() {
-    return (
-      <li key={this.props.key} className='line'>
-        <span className='time'>{formatTimestamp(this.props.time)}</span>
-        <span className='nick'>{this.props.nick}:</span>
-        <span className='msg'>{this.props.msg}</span>
-      </li>
-    )
-  }
-})
-
+const Line = props => {
+  return (
+    <li key={props.key} className='line'>
+      <span className='time'>{formatTimestamp(props.time)}</span>
+      <span className='nick'>{props.user}:</span>
+      <span className='msg'>{props.msg}</span>
+    </li>
+  )
+}
 
 function formatTimestamp(datestr) {
   const date = new Date(datestr)
