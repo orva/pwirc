@@ -17,8 +17,15 @@ function shouldBeMessageObject(obj) {
 
 describe('IrcServer', function() {
   beforeEach(function() {
-    const client = new EventEmitter()
-    client.nick = 'test-user'
+    this.client = new EventEmitter()
+    this.client.nick = 'test-user'
+    this.client.join = sinon.spy()
+    this.client.chans = {'#testing-1': {}, '#testing-2': {}}
+    this.client.supported = {
+      channel: {
+        types: '&#'
+      }
+    }
 
     this.connectArgs = [
       'freenode', 'chat.freenode.net', 'test-user',
@@ -26,7 +33,7 @@ describe('IrcServer', function() {
     ]
 
     this.stubIrc = {}
-    this.stubIrc.Client = sinon.stub().returns(client)
+    this.stubIrc.Client = sinon.stub().returns(this.client)
 
     this.irc = proxyquire(ircPath, { 'irc': this.stubIrc })
     this.server = this.irc.connect.apply({}, this.connectArgs)
@@ -58,9 +65,20 @@ describe('IrcServer', function() {
   })
 
   describe('join', function() {
-    it('calls irc.join with provided channel')
-    it('fails if already joined the channel')
-    it('fails if channel is not proper channel name')
+    it('calls irc.join with provided channel', function() {
+      this.irc.join(this.server, '#new-channel')
+      should(this.client.join.calledWith('#new-channel')).be.ok()
+    })
+
+    it('fails if already joined the channel', function() {
+      this.irc.join(this.server, '#testing-1')
+      should(this.client.join.called).be.false()
+    })
+
+    it('fails if channel is not proper channel name', function() {
+      this.irc.join(this.server, 'banana')
+      should(this.client.join.called).be.false()
+    })
   })
 
   describe('close', function() {

@@ -17,7 +17,8 @@ export function connect(name, url, nick, opts) {
 }
 
 export function join(server, channel, cb) {
-  if (!server || !channel || R.contains(channel, channels(server))) {
+  if (!server || !channel || R.contains(channel, channels(server)) ||
+      !isChannelName(server, channel)) {
     return
   }
 
