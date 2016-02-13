@@ -16,12 +16,45 @@ function shouldBeMessageObject(obj) {
 }
 
 describe('IrcServer', function() {
+  beforeEach(function() {
+    const client = new EventEmitter()
+    client.nick = 'test-user'
+
+    this.connectArgs = [
+      'freenode', 'chat.freenode.net', 'test-user',
+      { channels: ['#testing-1', '#testing-2'] }
+    ]
+
+    this.stubIrc = {}
+    this.stubIrc.Client = sinon.stub().returns(client)
+
+    this.irc = proxyquire(ircPath, { 'irc': this.stubIrc })
+    this.server = this.irc.connect.apply({}, this.connectArgs)
+  })
+
   describe('connect', function() {
-    it('constructs irc.Client with provided parameters')
-    it('offers event emitter')
-    it('stores provided server name')
-    it('stores provided server url')
-    it('stores listeners attached to irc.Client')
+    it('constructs irc.Client with provided parameters', function() {
+      const expectedParams = R.tail(this.connectArgs)
+      const callParams = this.stubIrc.Client.args[0]
+      should.deepEqual(callParams, expectedParams)
+    })
+
+    it('offers object with field events', function() {
+      should.exist(this.server.events)
+      should(this.server.events instanceof EventEmitter).be.true()
+    })
+
+    it('stores provided server name', function() {
+      const serverName = R.head(this.connectArgs)
+      should.equal(this.server.name, serverName)
+    })
+
+    it('stores provided server url', function() {
+      const serverUrl = this.connectArgs[1]
+      should.equal(this.server.serverUrl, serverUrl)
+    })
+
+    it('stores listeners attached to Server.irc')
   })
 
   describe('join', function() {
@@ -32,7 +65,8 @@ describe('IrcServer', function() {
 
   describe('close', function() {
     it('removes event listeners from irc connection')
-    it('does remove events-field from the object')
+    it('removes events field from the object')
+    it('removes irc field from the object')
   })
 
   describe('say', function() {
@@ -58,18 +92,6 @@ describe('IrcServer', function() {
   })
 
   describe('events', function() {
-    beforeEach(function() {
-      const stubCon = {}
-      const client = new EventEmitter()
-      client.nick = 'test-user'
-
-      stubCon.Client = sinon.stub().returns(client)
-
-      this.irc = proxyquire(ircPath, { 'irc': stubCon })
-      this.server = this.irc.connect('freenode', 'chat.freenode.net', 'test-user',
-        { channels: ['#testing-1', '#testing-2'] })
-    })
-
     describe('message', function() {
       it('is emitted when channel receives messages from other users', function(done) {
         this.server.events.on('message', function(msg) {
