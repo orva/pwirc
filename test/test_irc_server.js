@@ -1,3 +1,20 @@
+import EventEmitter from 'events'
+import R from 'ramda'
+import sinon from 'sinon'
+import should from 'should'
+import proxyquire from 'proxyquire'
+
+const ircPath = '../server/irc_server'
+
+function shouldBeMessageObject(obj) {
+  should.exist(obj.time)
+  should.exist(obj.key)
+  should.exist(obj.server)
+  should.exist(obj.user)
+  should.exist(obj.to)
+  should.exist(obj.msg)
+}
+
 describe('IrcServer', function() {
   describe('connect', function() {
     it('constructs irc.Client with provided parameters')
@@ -41,11 +58,56 @@ describe('IrcServer', function() {
   })
 
   describe('events', function() {
+    beforeEach(function() {
+      const stubCon = {}
+      const client = new EventEmitter()
+      client.nick = 'test-user'
+
+      stubCon.Client = sinon.stub().returns(client)
+
+      this.irc = proxyquire(ircPath, { 'irc': stubCon })
+      this.server = this.irc.connect('freenode', 'chat.freenode.net', 'test-user',
+        { channels: ['#testing-1', '#testing-2'] })
+    })
+
     describe('message', function() {
-      it('is emitted when channels receives message')
-      it('is emitted when user says something')
-      it('is payload can be found with messages-call')
-      it('contains expected fields in payload')
+      it('is emitted when channel receives messages from other users', function(done) {
+        this.server.events.on('message', function(msg) {
+          should.exist(msg)
+          shouldBeMessageObject(msg)
+          should.equal(msg.user, 'other-user')
+          should.equal(msg.to, '#testing-1')
+          should.equal(msg.msg, 'hello world!')
+          done()
+        })
+
+        this.server.irc.emit('message', 'other-user', '#testing-1', 'hello world!')
+      })
+
+      it('is emitted when user sends message to channel', function(done) {
+        this.server.events.on('message', function(msg) {
+          should.exist(msg)
+          shouldBeMessageObject(msg)
+          should.equal(msg.user, 'test-user')
+          should.equal(msg.to, '#testing-1')
+          should.equal(msg.msg, 'hello world!')
+          done()
+        })
+
+        this.server.irc.emit('message', 'test-user', '#testing-1', 'hello world!')
+      })
+
+      it('is payload can be found with messages-call', function(done) {
+        const server = this.server
+        const irc = this.irc
+        this.server.events.on('message', function(msg) {
+          const messageExists = R.contains(msg, irc.messages('#testing-1', server))
+          should(messageExists).be.true()
+          done()
+        })
+
+        this.server.irc.emit('message', 'test-user', '#testing-1', 'hello world!')
+      })
     })
 
     describe('private-message', function() {
@@ -55,9 +117,34 @@ describe('IrcServer', function() {
     })
 
     describe('channel-joined', function() {
-      it('is emitted when user joins a channel')
-      it('is not emitted someone else joins a channel')
-      it('contains expected fields in payload')
+      it('is emitted when user joins a channel', function(done) {
+        this.server.events.on('channel-joined', function() {
+          done()
+        })
+
+        this.server.irc.emit('join', '#testing-3', 'test-user')
+      })
+
+      it('is not emitted someone else joins a channel', function(done) {
+        const spy = sinon.spy()
+        this.server.events.on('channel-joined', spy)
+        this.server.irc.emit('join', '#testing-3', 'other-user')
+
+        setTimeout(() => {
+          should(spy.called).be.false()
+          done()
+        }, 25)
+      })
+
+      it('contains expected fields in payload', function(done) {
+        this.server.events.on('channel-joined', function(chan) {
+          should.exist(chan)
+          should.equal(chan, '#testing-3')
+          done()
+        })
+
+        this.server.irc.emit('join', '#testing-3', 'test-user')
+      })
     })
 
     describe('channel-left', function() {
