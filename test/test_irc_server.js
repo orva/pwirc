@@ -20,6 +20,7 @@ describe('IrcServer', function() {
     this.client = new EventEmitter()
     this.client.nick = 'test-user'
     this.client.join = sinon.spy()
+    this.client.say = sinon.spy()
     this.client.chans = {'#testing-1': {}, '#testing-2': {}}
     this.client.supported = {
       channel: {
@@ -81,16 +82,29 @@ describe('IrcServer', function() {
     })
   })
 
-  describe('close', function() {
+  describe('disconnect', function() {
     it('removes event listeners from irc connection')
     it('removes events field from the object')
     it('removes irc field from the object')
   })
 
   describe('say', function() {
-    it('calls irc.say with provided target and channel')
-    it('succeeds when target is not channel')
-    it('fails if target is non-present channel')
+    it('calls irc.say with provided target and message', function() {
+      this.irc.say('#testing-1', 'hello world!', this.server)
+      const callParams = this.client.say.args[0]
+      should.deepEqual(callParams, ['#testing-1', 'hello world!'])
+    })
+
+    it('succeeds when target is not channel', function() {
+      this.irc.say('other-user', 'hello world!', this.server)
+      const callParams = this.client.say.args[0]
+      should.deepEqual(callParams, ['other-user', 'hello world!'])
+    })
+
+    it('fails if target channel is not already joined', function() {
+      this.irc.say('#unkown-channel', 'hello world!', this.server)
+      should(this.client.join.called).be.false()
+    })
   })
 
   describe('messages', function() {
@@ -193,19 +207,19 @@ describe('IrcServer', function() {
       it('contains expected fields in payload')
     })
 
-    describe('join', function() {
+    describe('event-join', function() {
       it('is emitted when someone else joins a channel')
       it('is not emitted when user joins a channel')
       it('contains expected fields in payload')
     })
 
-    describe('part', function() {
+    describe('event-part', function() {
       it('is emitted when someone else parts a channel')
       it('is not emitted when user parts a channel')
       it('contains expected fields in payload')
     })
 
-    describe('action', function() {
+    describe('event-action', function() {
       it('is emitted when someone else does an action in channel')
       it('is emitted when user does an action in channel')
       it('contains expected fields in payload')
