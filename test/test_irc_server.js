@@ -6,15 +6,6 @@ import proxyquire from 'proxyquire'
 
 const ircPath = '../server/irc_server'
 
-function shouldBeMessageObject(obj) {
-  should.exist(obj.time)
-  should.exist(obj.key)
-  should.exist(obj.server)
-  should.exist(obj.user)
-  should.exist(obj.to)
-  should.exist(obj.msg)
-}
-
 describe('IrcServer', function() {
   beforeEach(function() {
     this.client = new EventEmitter()
@@ -119,12 +110,31 @@ describe('IrcServer', function() {
   })
 
   describe('channels', function() {
-    it('returns channel names from irc.chans')
-    it('returns empty array if there is no channels')
+    it('returns channel names from irc.chans', function() {
+      should.deepEqual(this.irc.channels(this.server),
+        ['#testing-1', '#testing-2'])
+      this.client.chans['#banana'] = {}
+      should.deepEqual(this.irc.channels(this.server),
+        ['#testing-1', '#testing-2', '#banana'])
+    })
+
+    it('returns empty array if there is no channels', function() {
+      this.client.chans = {}
+      should.deepEqual(this.irc.channels(this.server), [])
+    })
   })
 
   describe('events', function() {
     describe('message', function() {
+      function shouldBeMessageObject(obj) {
+        should.exist(obj.time)
+        should.exist(obj.key)
+        should.exist(obj.server)
+        should.exist(obj.user)
+        should.exist(obj.to)
+        should.exist(obj.msg)
+      }
+
       it('is emitted when channel receives messages from other users', function(done) {
         this.server.events.on('message', function(msg) {
           should.exist(msg)
