@@ -34,6 +34,10 @@ export function messages(channel, server) {
 }
 
 export function channels(server) {
+  if (!server) {
+    return []
+  }
+
   return R.keys(server.irc.chans)
 }
 

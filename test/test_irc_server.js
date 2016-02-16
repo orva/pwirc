@@ -122,6 +122,10 @@ describe('IrcServer', function() {
       this.client.chans = {}
       should.deepEqual(this.irc.channels(this.server), [])
     })
+
+    it('returns empty array if server is undefined', function() {
+      should.deepEqual(this.irc.channels(undefined), [])
+    })
   })
 
   describe('events', function() {
