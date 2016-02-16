@@ -11,14 +11,15 @@ describe('config', function() {
   beforeEach(function() {
     this.filename = path.join(__dirname, '.test_config.json')
     this.configs = {
-      connected: {
-        freenode: {
-          server: 'chat.freenode.net',
+      connected: [
+        {
+          serverName: 'freenode',
+          connectedUrl: 'chat.freenode.net',
           nick: 'test-user',
           realName: 'John Doe',
           channels: ['#test1', '#test2']
         }
-      },
+      ],
       servers: {
         freenode: ['chat.freenode.net'],
         quakenet: ['irc.quakenet.com']

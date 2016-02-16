@@ -34,17 +34,14 @@ sock.on('message', msg => {
 })
 
 sock.on('welcome', () => {
-  const path = window.location.pathname
-  const channelPath = /^\/channels\/.+/
-
-  if (channelPath.test(path)) {
-    page(window.location.pathname)
-  } else {
-    const chan = store.getState().channels[0]
-    const uri = '/channels/' + encodeURIComponent(chan.server) + '/' +
-      encodeURIComponent(chan.channel)
-    page(uri)
+  const chan = store.getState().channels[0]
+  if (!chan) {
+    return
   }
+
+  const uri = '/channels/' + encodeURIComponent(chan.server) + '/' +
+    encodeURIComponent(chan.channel)
+  page(uri)
 })
 
 

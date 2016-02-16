@@ -4,9 +4,11 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import SocketIO from 'socket.io'
 import R from 'ramda'
+import Promise from 'bluebird'
 
 import * as irc from './irc_server'
 import * as channel from './channel_filter'
+import * as config from './config'
 
 const app = express()
 const httpServer = http.Server(app)
@@ -16,9 +18,7 @@ const io = SocketIO(httpServer)
 // TODO: We actually need some kind of manager that wraps all the server
 //       connections, so our client session needs only put listerners to one
 //       place.
-var connectedServers = [
-  irc.connect('freenode', 'chat.freenode.net', 'nirc-test-user', { channels: ['#nirc-testing-1', '#nirc-testing-2'] })
-]
+var connectedServers = [ ]
 
 app.disable('x-powered-by')
 app.use(express.static(path.join(__dirname, '../dist')))
@@ -86,15 +86,36 @@ io.on('connection', sock => {
     sock.emit('message', msg)
   })
 
-  sock.emit('channels-updated', allChannels(connectedServers))
+  const chans = allChannels(connectedServers)
+  sock.emit('channels-updated', chans)
   sock.emit('welcome')
 })
 
-R.forEach(R.curry(serverBroadcasts)(io), connectedServers)
 
-httpServer.listen(31337, () => {
-  console.log('server started, port 31337')
-})
+
+const listen = Promise.promisify(httpServer.listen).bind(httpServer)
+config.load(path.join(__dirname, '../data/configuration.json'))
+  .then(conf => {
+    console.log('Following config loaded:', conf)
+
+    const connected = R.prop('connected', conf) || []
+    const servers = R.map(reconnectIrcServer, connected)
+    R.forEach(R.curry(serverBroadcasts)(io))(servers)
+    connectedServers = servers
+
+    return listen(31337)
+  })
+  .tap(() => {
+    console.log('server started, port 31337')
+  })
+
+
+// helpers
+
+function reconnectIrcServer(con) {
+  return irc.connect(con.serverName, con.serverUrl, con.nick,
+    { channels: con.channels})
+}
 
 function serverBroadcasts(sockIO, server) {
   server.events.on('channel-joined', () => {
