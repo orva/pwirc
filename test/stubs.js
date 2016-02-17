@@ -6,7 +6,14 @@ export function server() {
     serverUrl: 'chat.freenode.net',
     name: 'freenode',
     events: new EventEmitter(),
-    allMessages: messages()
+    allMessages: messages(),
+    irc: {
+      supported: {
+        channel: {
+          types: '&#'
+        }
+      }
+    }
   }
 }
 

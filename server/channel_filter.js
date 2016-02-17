@@ -51,7 +51,6 @@ export function switchChannel(session, channel) {
 }
 
 
-
 function setupChannelEventlEmitters(session) {
   const channelMessageListener = msg => {
     if (msg.to === session.channel)

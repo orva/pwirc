@@ -7,6 +7,7 @@ import R from 'ramda'
 import Promise from 'bluebird'
 
 import * as irc from './irc_server'
+import * as serverState from './irc_server_state'
 import * as channel from './channel_filter'
 import * as config from './config'
 
@@ -14,11 +15,8 @@ const app = express()
 const httpServer = http.Server(app)
 const io = SocketIO(httpServer)
 
+const servers = serverState.create()
 
-// TODO: We actually need some kind of manager that wraps all the server
-//       connections, so our client session needs only put listerners to one
-//       place.
-var connectedServers = [ ]
 
 app.disable('x-powered-by')
 app.use(express.static(path.join(__dirname, '../dist')))
@@ -30,7 +28,7 @@ app.post('/messages/:server/:to', (req, res) => {
     return
   }
 
-  const server = findServer(req.params.server)
+  const server = serverState.find(servers, req.params.server)
   if (!server) {
     res.status(404).end()
     return
@@ -48,10 +46,10 @@ app.post('/messages/:server/:to', (req, res) => {
 })
 
 app.post('/channels/:server/:chan', (req, res) => {
-  const server = findServer(req.params.server)
+  const server = serverState.find(servers, req.params.server)
   if (!server ||
       !irc.isChannelName(server, req.params.chan) ||
-      isExistingChannel(req.params.server, req.params.chan)) {
+      serverState.isExistingChannel(servers, req.params.server, req.params.chan)) {
     res.status(404).end()
     return
   }
@@ -62,7 +60,7 @@ app.post('/channels/:server/:chan', (req, res) => {
 
 app.get('/channels/:server/:chan', (req, res) => {
   if (!req.accepts('html') ||
-      !isExistingChannel(req.params.server, req.params.chan)) {
+      !serverState.isExistingChannel(servers, req.params.server, req.params.chan)) {
     res.status(404).end()
     return
   }
@@ -70,8 +68,10 @@ app.get('/channels/:server/:chan', (req, res) => {
   res.sendFile(path.join(__dirname, '../dist/index.html'))
 })
 
+
+
 io.on('connection', sock => {
-  const session = channel.create(R.head(connectedServers))
+  const session = channel.create(R.head(servers.servers))
 
   sock.on('disconnect', () => {
     channel.close(session)
@@ -86,31 +86,28 @@ io.on('connection', sock => {
     sock.emit('message', msg)
   })
 
-  const chans = allChannels(connectedServers)
+  const chans = serverState.allChannels(servers)
   sock.emit('channels-updated', chans)
   sock.emit('welcome')
 })
 
 
 
-const listen = Promise.promisify(httpServer.listen).bind(httpServer)
 config.load(path.join(__dirname, '../data/configuration.json'))
   .then(conf => {
     console.log('Following config loaded:', conf)
 
     const connected = R.prop('connected', conf) || []
-    const servers = R.map(reconnectIrcServer, connected)
-    R.forEach(R.curry(serverBroadcasts)(io))(servers)
-    connectedServers = servers
+    const ircs = R.map(reconnectIrcServer, connected)
+    R.forEach(R.curry(serverState.add)(servers), ircs)
+    R.forEach(R.curry(serverBroadcasts)(io))(ircs)
 
+    const listen = Promise.promisify(httpServer.listen).bind(httpServer)
     return listen(31337)
   })
   .tap(() => {
     console.log('server started, port 31337')
   })
-
-
-// helpers
 
 function reconnectIrcServer(con) {
   return irc.connect(con.serverName, con.serverUrl, con.nick,
@@ -119,33 +116,11 @@ function reconnectIrcServer(con) {
 
 function serverBroadcasts(sockIO, server) {
   server.events.on('channel-joined', () => {
-    sockIO.emit('channel-joined', { channels: allChannels(connectedServers) })
+    sockIO.emit('channel-joined', {
+      channels: serverState.allChannels(servers)
+    })
   })
 }
 
-function findServer(serverName) {
-  return R.find(R.propEq('name', serverName), connectedServers)
-}
-
-function allChannels(servers) {
-  const chans = R.map(srv => {
-    const createChan = R.pipe(
-      R.createMapEntry('channel'),
-      R.assoc('server', srv.name)
-    )
-    return R.map(createChan, irc.channels(srv))
-  }, servers)
-
-  return R.flatten(chans)
-}
-
-function isExistingChannel(serverName, chan) {
-  const server = findServer(serverName)
-
-  return (server &&
-    irc.isChannelName(server, chan) &&
-    R.contains(chan, irc.channels(server))
-  )
-}
 
 module.exports = app

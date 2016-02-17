@@ -59,7 +59,6 @@ function setupServerEventListeners(server) {
     const message = createMessageObject(server.serverUrl, from, to, msg)
     server.allMessages.push(message)
     server.events.emit('message', message)
-    console.log('message', message)
   })
 
   server.irc.addListener('selfMessage', (to, msg) => {
@@ -67,7 +66,6 @@ function setupServerEventListeners(server) {
     const message = createMessageObject(server.serverUrl, nick, to, msg)
     server.allMessages.push(message)
     server.events.emit('message', message)
-    console.log('selfMessage', message)
   })
 
   server.irc.addListener('join', (chan, nick) => {
