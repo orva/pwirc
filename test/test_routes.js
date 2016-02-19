@@ -1,3 +1,4 @@
+import R from 'ramda'
 import request from 'supertest'
 import sinon from 'sinon'
 import proxyquire from 'proxyquire'
@@ -12,8 +13,17 @@ describe('Routes', function() {
     ircStub.isChannelName.returns(true)
     ircStub.channels.returns(['#first', '#second'])
 
+    const serversStub = {}
+    serversStub.isExistingChannel = (_, srv, chan) => {
+      return srv === 'freenode' && R.contains(chan, ['#first', '#second'])
+    }
+    serversStub.find = (_, name) => name === 'freenode' ? stubs.server() : undefined
+
     this.ircStub = ircStub
-    this.app = proxyquire('../server/http_handlers', { './irc_server': ircStub })
+    this.app = proxyquire('../server/http_handlers', {
+      './irc_server': ircStub,
+      './irc_server_state': serversStub
+    })
   })
 
   afterEach(function() {
