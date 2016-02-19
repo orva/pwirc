@@ -17,7 +17,6 @@
     "lint": "eslint server/*.js client/*.js client/*.jsx"
   },
   "devDependencies": {
-    "babel-eslint": "^5.0.0",
     "babel-loader": "^6.2.3",
     "css-loader": "^0.23.1",
     "eslint": "^2.1.0",
