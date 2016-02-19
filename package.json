@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Private web irc client",
   "author": "Iivari Äikäs",
-  "license": "MIT",
+  "license": "GPLv3",
   "main": "server/start.js",
   "keywords": [
     "irc",
