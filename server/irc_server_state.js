@@ -24,7 +24,7 @@ export function remove(state, server) {
 export function allChannels(state) {
   const channels = R.map(srv => {
     const createChan = R.pipe(
-      R.createMapEntry('channel'),
+      R.objOf('channel'),
       R.assoc('server', srv.name)
     )
     return R.map(createChan, irc.channels(srv))
