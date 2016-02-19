@@ -11,6 +11,8 @@ import * as serverState from './irc_server_state'
 import * as channel from './channel_filter'
 import * as config from './config'
 
+const configFile = path.join(__dirname, '../data/configuration.json')
+
 const app = express()
 const httpServer = http.Server(app)
 const io = SocketIO(httpServer)
@@ -73,6 +75,17 @@ app.get('/channels/:server/:chan', (req, res) => {
   res.sendFile(path.join(__dirname, '../dist/index.html'))
 })
 
+app.get('/servers', (req, res) => {
+  config.load(configFile)
+    .then(conf => {
+      const connected = R.map(R.pick(['name', 'serverUrl']), servers.servers)
+      const available = conf.servers
+      res.json({
+        connected: connected,
+        available: available
+      })
+    })
+})
 
 
 io.on('connection', sock => {
@@ -97,7 +110,7 @@ io.on('connection', sock => {
 
 
 
-config.load(path.join(__dirname, '../data/configuration.json'))
+config.load(configFile)
   .then(conf => {
     console.log('Following config loaded:', conf)
 
