@@ -17,6 +17,11 @@ const io = SocketIO(httpServer)
 
 const servers = serverState.create()
 
+servers.events.on('server-added', srv => {
+  serverBroadcasts(io, srv)
+  io.emit('channels-updated', serverState.allChannels(servers))
+})
+
 
 app.disable('x-powered-by')
 app.use(express.static(path.join(__dirname, '../dist')))
@@ -86,8 +91,7 @@ io.on('connection', sock => {
     sock.emit('message', msg)
   })
 
-  const chans = serverState.allChannels(servers)
-  sock.emit('channels-updated', chans)
+  sock.emit('channels-updated', serverState.allChannels(servers))
   sock.emit('welcome')
 })
 
@@ -100,7 +104,6 @@ config.load(path.join(__dirname, '../data/configuration.json'))
     const connected = R.prop('connected', conf) || []
     const ircs = R.map(reconnectIrcServer, connected)
     R.forEach(R.curry(serverState.add)(servers), ircs)
-    R.forEach(R.curry(serverBroadcasts)(io))(ircs)
 
     const listen = Promise.promisify(httpServer.listen).bind(httpServer)
     return listen(31337)
@@ -116,9 +119,7 @@ function reconnectIrcServer(con) {
 
 function serverBroadcasts(sockIO, server) {
   server.events.on('channel-joined', () => {
-    sockIO.emit('channel-joined', {
-      channels: serverState.allChannels(servers)
-    })
+    sockIO.emit('channels-updated', serverState.allChannels(servers))
   })
 }
 
