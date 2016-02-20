@@ -14,33 +14,31 @@ listeners to correct places.
 
 */
 
-export function create(server) {
+export function create(state) {
+  const server = R.head(state.servers)
   const channel = R.head(irc.channels(server))
 
+  // This session might have both server and channel as undefined
   const session = {
     server: server,
     channel: channel,
-    events: new EventEmitter()
+    events: new EventEmitter(),
+    state: state
   }
 
+  const stateListeners = setupStateEventListeners(session)
   const listeners = setupChannelEventlEmitters(session)
   session.listeners = listeners
+  session.stateListeners = stateListeners
   return session
 }
 
 export function close(session) {
+  removeStateListeners(session)
   removeChannelEventListeners(session)
   session.listeners = undefined
   session.channel = undefined
   session.server = undefined
-}
-
-export function initialState(session) {
-  return {
-    lines: irc.messages(session.channel, session.server),
-    server: session.server.name,
-    channel: session.channel
-  }
 }
 
 export function switchChannel(session, channel) {
@@ -51,7 +49,23 @@ export function switchChannel(session, channel) {
 }
 
 
+function initialState(session) {
+  if (!session.server) {
+    return { lines: [], server: undefined, channel: undefined }
+  }
+
+  return {
+    lines: irc.messages(session.channel, session.server),
+    server: session.server.name,
+    channel: session.channel
+  }
+}
+
 function setupChannelEventlEmitters(session) {
+  if (!session.server) {
+    return
+  }
+
   const channelMessageListener = msg => {
     if (msg.to === session.channel)
       session.events.emit('message', msg)
@@ -65,8 +79,39 @@ function setupChannelEventlEmitters(session) {
   return listeners
 }
 
+function setupStateEventListeners(session) {
+  const add = srv => {
+    if (!session.server) {
+      session.server = srv
+      session.channel = R.head(irc.channels(srv))
+      setupChannelEventlEmitters(session)
+    }
+  }
+
+  const listeners = [
+    { type: 'server-added', callback: add }
+  ]
+  R.forEach(l => session.state.events.on(l.type, l.callback), listeners)
+
+  return listeners
+}
+
 function removeChannelEventListeners(session) {
+  if (!session.server) {
+    return
+  }
+
   R.forEach(listener => {
     session.server.events.removeListener(listener.type, listener.callback)
   }, session.listeners)
+}
+
+function removeStateListeners(session) {
+  if (!session.state) {
+    return
+  }
+
+  R.forEach(listener => {
+    session.state.events.removeListener(listener.type, listener.callback)
+  }, session.stateListeners)
 }

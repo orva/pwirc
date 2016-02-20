@@ -89,7 +89,7 @@ app.get('/servers', (req, res) => {
 
 
 io.on('connection', sock => {
-  const session = channel.create(R.head(servers.servers))
+  const session = channel.create(servers)
 
   sock.on('disconnect', () => {
     channel.close(session)

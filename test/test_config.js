@@ -7,7 +7,7 @@ const fs = Promise.promisifyAll(_fs)
 
 import * as config from '../server/config'
 
-describe('config', function() {
+describe('Config', function() {
   beforeEach(function() {
     this.filename = path.join(__dirname, '.test_config.json')
     this.configs = {
