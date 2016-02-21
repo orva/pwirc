@@ -1,5 +1,7 @@
 {
   "servers": {
-    "freenode": ["chat.freenode.net"]
+    "freenode": ["chat.freenode.net"],
+    "mozilla": ["irc.mozilla.org"],
+    "quakenet": ["irc.quakenet.org"]
   }
 }

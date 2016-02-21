@@ -9,14 +9,18 @@ import './app.css'
 
 const App = React.createClass({
   render: function() {
-    const { messages, channels, currentChannel } = this.props
+    const {
+      messages, channels, currentChannel, connectedServers, availableServers
+    } = this.props
 
     return (
       <div id="sidepanel-view">
         <div id="sidepanel">
           <Channels switchChannel={channelSwitcher(this.props.sock)}
             channels={channels}
-            openPopup={openPopup}/>
+            openPopup={openPopup}
+            connectedServers={connectedServers}
+            availableServers={availableServers} />
         </div>
         <div id="content">
           <Messages messages={messages} currentChannel={currentChannel}/>

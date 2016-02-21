@@ -20,7 +20,9 @@ export default React.createClass({
   },
 
   openJoin: function() {
-    const join = <JoinDialogue />
+    const join = <JoinDialogue
+      connectedServers={this.props.connectedServers}
+      availableServers={this.props.availableServers} />
     this.props.openPopup('Join channel', join)
   },
 

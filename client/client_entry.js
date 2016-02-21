@@ -51,3 +51,12 @@ render(
   </Provider>,
   document.getElementById('app')
 )
+
+fetch('/servers')
+  .then(resp => {
+    return resp.json()
+  })
+  .then(servers => {
+    console.log(servers)
+    store.dispatch(actions.updateServers(servers))
+  })
