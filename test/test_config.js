@@ -5,26 +5,13 @@ import should from 'should'
 import _fs from 'fs'
 const fs = Promise.promisifyAll(_fs)
 
+import * as stubs from './stubs'
 import * as config from '../server/config'
 
 describe('Config', function() {
   beforeEach(function() {
     this.filename = path.join(__dirname, '.test_config.json')
-    this.configs = {
-      connected: [
-        {
-          serverName: 'freenode',
-          connectedUrl: 'chat.freenode.net',
-          nick: 'test-user',
-          realName: 'John Doe',
-          channels: ['#test1', '#test2']
-        }
-      ],
-      servers: {
-        freenode: ['chat.freenode.net'],
-        quakenet: ['irc.quakenet.com']
-      }
-    }
+    this.configs = stubs.config()
 
     const jsonStr = JSON.stringify(this.configs)
     const defaultsFile = path.join(__dirname, '../server/default_configuration.json')

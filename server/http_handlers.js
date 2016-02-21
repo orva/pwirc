@@ -43,7 +43,7 @@ app.post('/messages/:server/:to', (req, res) => {
 
   // If target is channel, it needs to exist
   if (irc.isChannelName(server, req.params.to) &&
-      !R.contains(req.params.to, irc.channels(server))) {
+      !serverState.isExistingChannel(servers, req.params.server, req.params.to)) {
     res.status(404).end()
     return
   }

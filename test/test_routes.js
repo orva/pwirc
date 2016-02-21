@@ -1,3 +1,4 @@
+import Promise from 'bluebird'
 import R from 'ramda'
 import request from 'supertest'
 import sinon from 'sinon'
@@ -17,12 +18,17 @@ describe('Routes', function() {
     serversStub.isExistingChannel = (_, srv, chan) => {
       return srv === 'freenode' && R.contains(chan, ['#first', '#second'])
     }
-    serversStub.find = (_, name) => name === 'freenode' ? stubs.server() : undefined
+    serversStub.servers = [stubs.server()]
 
     this.ircStub = ircStub
+
+    const confStub = {}
+    confStub.load = sinon.stub().returns(Promise.resolve(stubs.config()))
+
     this.app = proxyquire('../server/http_handlers', {
       './irc_server': ircStub,
-      './irc_server_state': serversStub
+      './irc_server_state': serversStub,
+      './config': confStub
     })
   })
 
@@ -153,6 +159,23 @@ describe('Routes', function() {
       request(this.app)
         .post('/channels/freenode/not_valid_channel_name')
         .expect(404, done)
+    })
+  })
+
+  describe('GET /servers', function() {
+    it('responds 200 with JSON body containing connected and available servers', function(done) {
+      request(this.app)
+        .get('/servers')
+        .expect({
+          connected: [ {name: 'freenode', serverUrl: 'chat.freenode.net'} ],
+          available: {
+            freenode: ['chat.freenode.net'],
+            mozilla: ['irc.mozilla.org'],
+            quakenet: ['irc.quakenet.org']
+          }
+        })
+        .expect(200, done)
+
     })
   })
 })

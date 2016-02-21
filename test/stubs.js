@@ -42,3 +42,22 @@ export function initialState() {
     lines: messages(R.filter(R.propEq('to', '#first'), messages()))
   }
 }
+
+export function config() {
+  return  {
+    connected: [
+      {
+        serverName: 'freenode',
+        connectedUrl: 'chat.freenode.net',
+        nick: 'test-user',
+        realName: 'John Doe',
+        channels: ['#test1', '#test2']
+      }
+    ],
+    servers: {
+      freenode: ['chat.freenode.net'],
+      mozilla: ['irc.mozilla.org'],
+      quakenet: ['irc.quakenet.org']
+    }
+  }
+}
