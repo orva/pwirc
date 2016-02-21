@@ -14,7 +14,7 @@
     "test": "mocha --compilers js:babel-register",
     "start": "node server/start.js",
     "watch": "webpack --watch --debug",
-    "lint": "eslint server/*.js client/*.js client/*.jsx"
+    "lint": "eslint server/*.js client/*.js client/**/*.jsx"
   },
   "devDependencies": {
     "babel-loader": "^6.2.3",
