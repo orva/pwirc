@@ -4,6 +4,8 @@ import * as actions from './actions'
 export default combineReducers({
   messages,
   channels,
+  connectedServers,
+  availableServers,
   currentChannel
 })
 
@@ -22,6 +24,24 @@ function channels(state = [], action) {
   switch (action.type) {
     case actions.UPDATE_CHANNELS:
       return action.payload
+    default:
+      return state
+  }
+}
+
+function connectedServers(state = [], action) {
+  switch (action.type) {
+    case actions.UPDATE_SERVERS:
+      return action.payload.connected
+    default:
+      return state
+  }
+}
+
+function availableServers(state = [], action) {
+  switch (action.type) {
+    case actions.UPDATE_SERVERS:
+      return action.payload.available
     default:
       return state
   }

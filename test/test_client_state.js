@@ -8,7 +8,13 @@ import * as actions from '../client/actions.js'
 describe('Client state reducers', function() {
   it('has expected initial state', function() {
     const state = reducer(undefined, {})
-    should.deepEqual(state, { channels: [], messages: [], currentChannel: {} })
+    should.deepEqual(state, {
+      channels: [],
+      messages: [],
+      connectedServers: [],
+      availableServers: [],
+      currentChannel: {}
+    })
   })
 
   it('handles UPDATE_CHANNELS action', function() {
@@ -31,5 +37,23 @@ describe('Client state reducers', function() {
       server: initialState.server,
       channel: initialState.channel
     })
+  })
+
+  it('handles UPDATE_SERVERS action', function() {
+    const msg = {
+      connected: [
+        { name: 'freenode', serverUrl: 'chat.freenode.net' },
+        { name: 'quakenet', serverUrl: 'irc.quakenet.org' }
+      ],
+      available: {
+        freenode: ['chat.freenode.net'],
+        quakenet: ['irc.quakenet.org'],
+        mozilla: ['irc.mozilla.org']
+      }
+    }
+
+    const state = reducer({}, actions.updateServers(msg))
+    should.deepEqual(state.connectedServers, msg.connected)
+    should.deepEqual(state.availableServers, msg.available)
   })
 })
