@@ -19,8 +19,8 @@
   "devDependencies": {
     "babel-loader": "^6.2.3",
     "css-loader": "^0.23.1",
-    "eslint": "^2.1.0",
-    "eslint-plugin-react": "^3.16.1",
+    "eslint": "^2.10.2",
+    "eslint-plugin-react": "^5.1.1",
     "mocha": "^2.4.5",
     "page": "^1.6.4",
     "proxyquire": "^1.7.4",
