@@ -9,7 +9,7 @@ module.exports = {
     loaders: [
       {
         test: /\.jsx?$/,
-        include: /client|node_modules\/react-popup/,
+        include: /client/,
         loader: 'babel',
         query: {
           presets: ['es2015', 'stage-0', 'react']
