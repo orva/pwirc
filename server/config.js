@@ -1,19 +1,19 @@
-import path from 'path'
+const path = require('path')
 
-import Promise from 'bluebird'
+const Promise = require('bluebird')
 
-import _fs from 'fs'
+const _fs = require('fs')
 const fs = Promise.promisifyAll(_fs)
 
 
-export function load(filename) {
+function load(filename) {
   return fs.readFileAsync(filename, 'utf8')
     .then(contents => JSON.parse(contents))
     .catch(SyntaxError, () => defaults())
     .catch({code: 'ENOENT'}, () => defaults())
 }
 
-export function save(filename, conf) {
+function save(filename, conf) {
   const jsonString = JSON.stringify(conf)
   return fs.writeFileAsync(filename, jsonString, 'utf8')
 }
@@ -22,4 +22,9 @@ function defaults() {
   const defaultsFile = path.join(__dirname, 'default_configuration.json')
   return fs.readFileAsync(defaultsFile, 'utf8')
     .then(conf => JSON.parse(conf))
+}
+
+module.exports = {
+  load,
+  save
 }

@@ -1,12 +1,12 @@
-import EventEmitter from 'events'
-import R from 'ramda'
+const EventEmitter = require('events')
+const R = require('ramda')
 
-import should from 'should'
-import sinon from 'sinon'
-import proxyquire from 'proxyquire'
-import * as stubs from './stubs'
+const should = require('should')
+const sinon = require('sinon')
+const proxyquire = require('proxyquire')
+const stubs = require('./stubs')
 
-import * as serverState from '../server/irc_server_state'
+const serverState = require('../server/irc_server_state')
 
 const channelPath = '../server/channel_filter'
 

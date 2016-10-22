@@ -1,10 +1,10 @@
-import EventEmitter from 'events'
+const EventEmitter = require('events')
 
-import R from 'ramda'
-import irc from 'irc'
-import uuid from 'uuid'
+const R = require('ramda')
+const irc = require('irc')
+const uuid = require('uuid')
 
-export function connect(name, url, nick, opts) {
+function connect(name, url, nick, opts) {
   const server = {
     name: name,
     serverUrl: url,
@@ -16,7 +16,7 @@ export function connect(name, url, nick, opts) {
   return server
 }
 
-export function join(server, channel, cb) {
+function join(server, channel, cb) {
   if (!server || !channel || R.contains(channel, channels(server)) ||
       !isChannelName(server, channel)) {
     return
@@ -25,15 +25,15 @@ export function join(server, channel, cb) {
   server.irc.join(channel, cb)
 }
 
-export function say(target, msg, server) {
+function say(target, msg, server) {
   server.irc.say(target, msg)
 }
 
-export function messages(channel, server) {
+function messages(channel, server) {
   return R.filter(R.propEq('to', channel), server.allMessages)
 }
 
-export function channels(server) {
+function channels(server) {
   if (!server) {
     return []
   }
@@ -41,7 +41,7 @@ export function channels(server) {
   return R.keys(server.irc.chans)
 }
 
-export function isChannelName(server, name) {
+function isChannelName(server, name) {
   const chanPrefixes = R.split('', server.irc.supported.channel.types)
   const escaper = R.map(pref => '\\' + pref)
   const escapedChanPrefixes = R.join('', escaper(chanPrefixes))
@@ -84,4 +84,13 @@ function createMessageObject(serverUrl, from, to, msg) {
     to: to,
     msg: msg
   }
+}
+
+module.exports = {
+  connect,
+  join,
+  say,
+  messages,
+  channels,
+  isChannelName
 }

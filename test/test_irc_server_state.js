@@ -1,9 +1,9 @@
-import EventEmitter from 'events'
+const EventEmitter = require('events')
 
-import R from 'ramda'
-import should from 'should'
-import proxyquire from 'proxyquire'
-import * as stubs from './stubs'
+const R = require('ramda')
+const should = require('should')
+const proxyquire = require('proxyquire')
+const stubs = require('./stubs')
 
 describe('IrcServerState', function() {
   beforeEach(function() {

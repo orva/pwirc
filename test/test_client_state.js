@@ -1,9 +1,9 @@
-import * as R from 'ramda'
-import should from 'should'
-import * as stubs from './stubs'
+const R = require('ramda')
+const should = require('should')
+const stubs = require('./stubs')
 
-import reducer from '../client/reducers.js'
-import * as actions from '../client/actions.js'
+const reducer = require('../client/reducers.js')
+const actions = require('../client/actions.js')
 
 describe('Client state reducers', function() {
   it('has expected initial state', function() {

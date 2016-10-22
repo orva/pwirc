@@ -1,12 +1,12 @@
-import path from 'path'
-import Promise from 'bluebird'
-import should from 'should'
+const path = require('path')
+const Promise = require('bluebird')
+const should = require('should')
 
-import _fs from 'fs'
+const _fs = require('fs')
 const fs = Promise.promisifyAll(_fs)
 
-import * as stubs from './stubs'
-import * as config from '../server/config'
+const stubs = require('./stubs')
+const config = require('../server/config')
 
 describe('Config', function() {
   beforeEach(function() {

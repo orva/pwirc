@@ -1,7 +1,7 @@
-import EventEmitter from 'events'
-import R from 'ramda'
+const EventEmitter = require('events')
+const R = require('ramda')
 
-import * as irc from './irc_server'
+const irc = require('./irc_server')
 
 /*
 
@@ -14,7 +14,7 @@ listeners to correct places.
 
 */
 
-export function create(state) {
+function create(state) {
   const server = R.head(state.servers)
   const channel = R.head(irc.channels(server))
 
@@ -33,7 +33,7 @@ export function create(state) {
   return session
 }
 
-export function close(session) {
+function close(session) {
   removeStateListeners(session)
   removeChannelEventListeners(session)
   session.listeners = undefined
@@ -41,7 +41,7 @@ export function close(session) {
   session.server = undefined
 }
 
-export function switchChannel(session, channel) {
+function switchChannel(session, channel) {
   if (R.contains(channel, irc.channels(session.server))) {
     session.channel = channel
     return initialState(session)
@@ -114,4 +114,10 @@ function removeStateListeners(session) {
   R.forEach(listener => {
     session.state.events.removeListener(listener.type, listener.callback)
   }, session.stateListeners)
+}
+
+module.exports = {
+  create,
+  close,
+  switchChannel
 }

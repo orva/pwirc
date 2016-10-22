@@ -1,8 +1,8 @@
-import EventEmitter from 'events'
-import R from 'ramda'
-import sinon from 'sinon'
-import should from 'should'
-import proxyquire from 'proxyquire'
+const EventEmitter = require('events')
+const R = require('ramda')
+const sinon = require('sinon')
+const should = require('should')
+const proxyquire = require('proxyquire')
 
 const ircPath = '../server/irc_server'
 

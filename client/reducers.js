@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux'
 import * as actions from './actions'
 
-export default combineReducers({
+module.exports = combineReducers({
   messages,
   channels,
   connectedServers,

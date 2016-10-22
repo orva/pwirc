@@ -1,15 +1,15 @@
-import path from 'path'
-import http from 'http'
-import express from 'express'
-import bodyParser from 'body-parser'
-import SocketIO from 'socket.io'
-import R from 'ramda'
-import Promise from 'bluebird'
+const path = require('path')
+const http = require('http')
+const express = require('express')
+const bodyParser = require('body-parser')
+const SocketIO = require('socket.io')
+const R = require('ramda')
+const Promise = require('bluebird')
 
-import * as irc from './irc_server'
-import * as serverState from './irc_server_state'
-import * as channel from './channel_filter'
-import * as config from './config'
+const irc = require('./irc_server')
+const serverState = require('./irc_server_state')
+const channel = require('./channel_filter')
+const config = require('./config')
 
 const configFile = path.join(__dirname, '../data/configuration.json')
 

@@ -1,11 +1,11 @@
-import Promise from 'bluebird'
-import R from 'ramda'
-import request from 'supertest'
-import sinon from 'sinon'
-import proxyquire from 'proxyquire'
+const Promise = require('bluebird')
+const R = require('ramda')
+const request = require('supertest')
+const sinon = require('sinon')
+const proxyquire = require('proxyquire')
 
-import * as stubs from './stubs'
-import * as irc from '../server/irc_server'
+const stubs = require('./stubs')
+const irc = require('../server/irc_server')
 
 describe('Routes', function() {
   before(function() {

@@ -4,7 +4,7 @@
   "description": "Private web irc client",
   "author": "Iivari Äikäs",
   "license": "GPLv3",
-  "main": "server/start.js",
+  "main": "server/http_handlers.js",
   "keywords": [
     "irc",
     "web",
@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "test": "mocha --compilers js:babel-register",
-    "start": "node server/start.js",
+    "start": "node server/http_handlers.js",
     "watch": "webpack --watch --debug",
     "lint": "eslint server/*.js client/*.js client/**/*.jsx"
   },

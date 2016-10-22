@@ -1,27 +1,27 @@
-import EventEmitter from 'events'
-import R from 'ramda'
+const EventEmitter = require('events')
+const R = require('ramda')
 
-import * as irc from './irc_server'
+const irc = require('./irc_server')
 
-export function create() {
+function create() {
   return {
     events: new EventEmitter(),
     servers: []
   }
 }
 
-export function add(state, server) {
+function add(state, server) {
   state.servers.push(server)
   state.events.emit('server-added', server)
 }
 
-export function remove(state, server) {
+function remove(state, server) {
   const filtered = R.reject(R.equals(server))
   state.servers = filtered
   state.events.emit('server-removed', server)
 }
 
-export function allChannels(state) {
+function allChannels(state) {
   const channels = R.map(srv => {
     const createChan = R.pipe(
       R.objOf('channel'),
@@ -33,7 +33,7 @@ export function allChannels(state) {
   return R.flatten(channels(state.servers))
 }
 
-export function isExistingChannel(state, serverName, chan) {
+function isExistingChannel(state, serverName, chan) {
   const server = find(state, serverName)
 
   return (server &&
@@ -42,6 +42,15 @@ export function isExistingChannel(state, serverName, chan) {
   )
 }
 
-export function find(state, serverName) {
+function find(state, serverName) {
   return R.find(R.propEq('name', serverName), state.servers)
+}
+
+module.exports = {
+  create,
+  add,
+  remove,
+  allChannels,
+  isExistingChannel,
+  find
 }
