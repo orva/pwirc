@@ -33,12 +33,42 @@ sock.on('welcome', () => console.log('welcome'))
 
 const Messages = ({msgs}) => // eslint-disable-line no-unused-vars
   <ul className="messages">
-   { K(msgs, R.map(({key, user, msg}) => <li key={key}>{user} {msg}</li>)) }
+   { K(msgs, R.map(({key, time, user, msg}) =>
+      <li key={key} className="messages-msg">
+        <span className="messages-msg-timestamp">{formatTimestamp(time)}</span>
+        <span className="messages-msg-user">{user}</span> {msg}
+      </li>)) }
   </ul>
+
+const formatTimestamp = timeStr => {
+  try {
+    const d = new Date(timeStr)
+    return R.join(':', [
+      padTimePart(d.getHours()),
+      padTimePart(d.getMinutes()),
+      padTimePart(d.getSeconds())])
+  } catch (e) {
+    return '??:??:??'
+  }
+}
+
+const padTimePart = str => leftPad(2, '0', '' + str)
+
+const leftPad = (paddedLength, padder, str) => {
+  if (str.length >= paddedLength) {
+    return str
+  }
+
+  const padAmount = paddedLength - str.length
+  return R.concat(
+    R.join('', R.repeat(padder, padAmount)),
+    str)
+}
 
 const Channels = ({chans}) => // eslint-disable-line no-unused-vars
   <ul className="channels">
-   { K(chans, R.map(({channel, server, key=R.reduce(R.concat, '', [server, '-', channel])}) => <li key={key}>{channel}</li>)) }
+   { K(chans, R.map(({channel, server, key=R.reduce(R.concat, '', [server, '-', channel])}) =>
+       <li key={key} className="channels-chan">{channel}</li>)) }
   </ul>
 
 ReactDOM.render(
