@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css?family=Fira+Sans');
+
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+  max-height: 100%;
+  width:: 100%;
+  max-width:: 100%;
+}
+
+body {
+  font-family: 'Fira Sans', sans-serif;
+  display: flex;
+  height: 100%;
+  max-height: 100%;
+  width:: 100%;
+  max-width:: 100%;
+  padding: 0px;
+  margin: 0px;
+  color: #131516;
+}
+
+#channels-area {
+  width: 13em;
+  max-width: 13em;
+  height: 100%;
+  max-height: 100%;
+  padding: 0px;
+  margin: 0px;
+  border-right: 2px solid #8d8d8d;
+}
+
+#messages-area {
+  width: calc(100% - 13em);
+  max-width: calc(100% - 13em);
+  height: 100%;
+  max-height: 100%;
+  padding: 0px;
+  margin: 0px;
+}
+
+.channels {
+  height: 100%;
+  width:: 100%;
+  max-height: 100%;
+  max-width:: 100%;
+  margin: 0px;
+  padding: 1.5em;
+  list-style: none;
+  overflow-y: auto;
+}
+
+.messages {
+  height: 100%;
+  width:: 100%;
+  max-height: 100%;
+  max-width:: 100%;
+  margin: 0px;
+  padding: 1.5em;
+  list-style: none;
+  overflow-y: auto;
+}
