@@ -82,7 +82,7 @@ const switchChannel = channel => e => {
 
 ReactDOM.render(
   <Channels chans={channels} />,
-  document.getElementById('channels-area'))
+  document.getElementById('sidepanel-area'))
 
 ReactDOM.render(
   <Messages msgs={messages} />,
