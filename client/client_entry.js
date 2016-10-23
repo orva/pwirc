@@ -32,12 +32,21 @@ sock.on('welcome', () => console.log('welcome'))
 
 
 const Messages = ({msgs}) => // eslint-disable-line no-unused-vars
-  <ul>
+  <ul className="messages">
    { K(msgs, R.map(({key, user, msg}) => <li key={key}>{user} {msg}</li>)) }
   </ul>
 
+const Channels = ({chans}) => // eslint-disable-line no-unused-vars
+  <ul className="channels">
+   { K(chans, R.map(({channel, server, key=R.reduce(R.concat, '', [server, '-', channel])}) => <li key={key}>{channel}</li>)) }
+  </ul>
+
+ReactDOM.render(
+  <Channels chans={channels} />,
+  document.getElementById('channels-area'))
 
 ReactDOM.render(
   <Messages msgs={messages} />,
-  document.getElementById('messages'))
+  document.getElementById('messages-area'))
+
 
