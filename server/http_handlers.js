@@ -95,6 +95,7 @@ io.on('connection', sock => {
     channel.close(session)
   })
 
+  // TODO: enable siwtching channels in different server
   sock.on('switch', chan => {
     const state = channel.switchChannel(session, chan)
     sock.emit('channel-switched', state)

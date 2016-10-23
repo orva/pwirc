@@ -33,11 +33,11 @@ sock.on('welcome', () => console.log('welcome'))
 
 const Messages = ({msgs}) => // eslint-disable-line no-unused-vars
   <ul className="messages">
-   { K(msgs, R.map(({key, time, user, msg}) =>
+    {K(msgs, R.map(({key, time, user, msg}) =>
       <li key={key} className="messages-msg">
         <span className="messages-msg-timestamp">{formatTimestamp(time)}</span>
         <span className="messages-msg-user">{user}</span> {msg}
-      </li>)) }
+      </li>))}
   </ul>
 
 const formatTimestamp = timeStr => {
@@ -65,11 +65,20 @@ const leftPad = (paddedLength, padder, str) => {
     str)
 }
 
+
 const Channels = ({chans}) => // eslint-disable-line no-unused-vars
   <ul className="channels">
-   { K(chans, R.map(({channel, server, key=R.reduce(R.concat, '', [server, '-', channel])}) =>
-       <li key={key} className="channels-chan">{channel}</li>)) }
+    {K(chans, R.map(({channel, server, key=R.join('', [server, '-', channel])}) =>
+      <li key={key} className="channels-chan" onClick={switchChannel(channel)}>
+        {channel}
+      </li>))}
   </ul>
+
+const switchChannel = channel => e => {
+  e.preventDefault()
+  sock.emit('switch', channel)
+}
+
 
 ReactDOM.render(
   <Channels chans={channels} />,
