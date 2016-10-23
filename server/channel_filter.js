@@ -119,5 +119,6 @@ function removeStateListeners(session) {
 module.exports = {
   create,
   close,
-  switchChannel
+  switchChannel,
+  initialState
 }

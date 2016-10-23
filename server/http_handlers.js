@@ -105,6 +105,7 @@ io.on('connection', sock => {
   })
 
   sock.emit('channels-updated', serverState.allChannels(servers))
+  sock.emit('channel-switched', channel.initialState(session))
   sock.emit('welcome')
 })
 

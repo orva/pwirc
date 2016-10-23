@@ -136,6 +136,19 @@ describe('ChannelFilter', () => {
     })
   })
 
+  describe('initialState', function() {
+    it('returns expected initial state', function() {
+      const c = this.channel.create(this.stateStub)
+      const ret = this.channel.initialState(c)
+      const expected = {
+        server: 'freenode',
+        channel: '#first',
+        lines: R.filter(R.propEq('to', '#first'), c.server.allMessages)
+      }
+      should.deepEqual(ret, expected)
+    })
+  })
+
   describe('events', function() {
     it('does not emit "message" if server emits message not current channel', function(done) {
       const c = this.channel.create(this.stateStub)
