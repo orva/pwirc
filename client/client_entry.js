@@ -6,20 +6,31 @@ const K = require('karet.util').default
 const L = require('partial.lenses')
 const R = require('ramda')
 
+const JoinDialogue = require('./join_dialogue') // eslint-disable-line no-unused-vars
+
 const root = Atom({
   messages: [],
   channels: [],
-  currentChannel: {}
+  currentChannel: {},
+  openModals: {
+    join: false
+  },
+  servers: {
+    connected: [],
+    available: {},
+  }
 })
 
 root.log('root')
 
-const messages = root.lens('messages')
-const channels = root.lens(
+const messages = root.view('messages')
+const channels = root.view(
   'channels',
   L.normalize(R.sortBy(R.prop('channel'))))
-const currentChannel = root.lens('currentChannel')
 
+const currentChannel = root.view('currentChannel')
+const servers = root.view('servers')
+const joinOpen = root.lens('openModals', 'join')
 
 const sock = io.connect()
 sock.on('channel-switched', ({lines, server, channel}) => {
@@ -28,7 +39,13 @@ sock.on('channel-switched', ({lines, server, channel}) => {
 })
 sock.on('channels-updated', chans => channels.set(chans))
 sock.on('message', msg => messages.modify(R.append(msg)))
-sock.on('welcome', () => console.log('welcome'))
+sock.on('welcome', () => {
+  fetch('/servers')
+    .then(res => res.json())
+    .then(res => servers.set(res))
+
+  console.log('welcome')
+})
 
 
 const Messages = ({msgs}) => // eslint-disable-line no-unused-vars
@@ -65,10 +82,11 @@ const leftPad = (paddedLength, padder, str) => {
     str)
 }
 
+const dashedKey = parts => R.join('', R.intersperse('-', R.reject(R.isNil, parts)))
 
 const Channels = ({chans}) => // eslint-disable-line no-unused-vars
   <ul className="channels">
-    {K(chans, R.map(({channel, server, key=R.join('', [server, '-', channel])}) =>
+    {K(chans, R.map(({channel, server, key=dashedKey([channel, server])}) =>
       <li key={key} className="channels-chan" onClick={switchChannel(channel)}>
         {channel}
       </li>))}
@@ -79,7 +97,6 @@ const switchChannel = channel => e => {
   sock.emit('switch', channel)
 }
 
-
 ReactDOM.render(
   <Channels chans={channels} />,
   document.getElementById('sidepanel-area'))
@@ -88,4 +105,6 @@ ReactDOM.render(
   <Messages msgs={messages} />,
   document.getElementById('messages-area'))
 
-
+ReactDOM.render(
+  <JoinDialogue join={joinOpen} serverList={servers} />,
+  document.getElementById('modal-area'))
