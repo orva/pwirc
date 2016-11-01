@@ -86,7 +86,13 @@ const dashedKey = parts => R.join('', R.intersperse('-', R.reject(R.isNil, parts
 
 const Channels = ({chans}) => // eslint-disable-line no-unused-vars
   <div className="sidepanel">
-    <h3 className="sidepanel-header">Channels</h3>
+    <h3 className="sidepanel-header">
+      Channels
+      <a title="Join to a new channel">
+        <i className="sidepanel-header-glyph fa fa-plus-circle"
+           onClick={() => joinOpen.set(true)}></i>
+      </a>
+    </h3>
     <ul className="channels">
       {K(chans, R.map(({channel, server, key=dashedKey([channel, server])}) =>
         <li key={key} className="channels-chan" onClick={switchChannel(channel)}>
