@@ -106,6 +106,10 @@ const switchChannel = channel => e => {
   sock.emit('switch', channel)
 }
 
+const Input = () => // eslint-disable-line no-unused-vars
+  <input className="message-input" />
+
+
 ReactDOM.render(
   <Channels chans={channels} />,
   document.getElementById('sidepanel-area'))
@@ -113,6 +117,10 @@ ReactDOM.render(
 ReactDOM.render(
   <Messages msgs={messages} />,
   document.getElementById('messages-area'))
+
+ReactDOM.render(
+  <Input />,
+  document.getElementById('input-area'))
 
 ReactDOM.render(
   <JoinDialogue join={joinOpen} serverList={servers} />,
