@@ -85,12 +85,15 @@ const leftPad = (paddedLength, padder, str) => {
 const dashedKey = parts => R.join('', R.intersperse('-', R.reject(R.isNil, parts)))
 
 const Channels = ({chans}) => // eslint-disable-line no-unused-vars
-  <ul className="channels">
-    {K(chans, R.map(({channel, server, key=dashedKey([channel, server])}) =>
-      <li key={key} className="channels-chan" onClick={switchChannel(channel)}>
-        {channel}
-      </li>))}
-  </ul>
+  <div className="sidepanel">
+    <h3 className="sidepanel-header">Channels</h3>
+    <ul className="channels">
+      {K(chans, R.map(({channel, server, key=dashedKey([channel, server])}) =>
+        <li key={key} className="channels-chan" onClick={switchChannel(channel)}>
+          {channel}
+        </li>))}
+    </ul>
+  </div>
 
 const switchChannel = channel => e => {
   e.preventDefault()
