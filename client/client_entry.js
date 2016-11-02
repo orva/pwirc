@@ -11,7 +11,10 @@ const JoinDialogue = require('./join_dialogue') // eslint-disable-line no-unused
 const root = Atom({
   messages: [],
   channels: [],
-  currentChannel: {},
+  currentChannel: {
+    server: '',
+    channel: ''
+  },
   openModals: {
     join: false
   },
@@ -106,9 +109,34 @@ const switchChannel = channel => e => {
   sock.emit('switch', channel)
 }
 
-const Input = () => // eslint-disable-line no-unused-vars
-  <input className="message-input" />
+const Input = ({currentChan}) => { // eslint-disable-line no-unused-vars
+  const state = Atom({
+    msg: ''
+  })
 
+  return <input className="message-input"
+    value={ state.view('msg') }
+    onInput={ e => state.view('msg').set(e.target.value) }
+    onKeyPress={keypressHandler(state, currentChan)} />
+}
+
+const keypressHandler = (state, currentChan) => e => {
+  if (e.key !== 'Enter') {
+    return
+  }
+
+  const chan = currentChan.get()
+  const msg = state.view('msg')
+  const payload = { msg: msg.get() }
+  const url = `/messages/${chan.server}/${encodeURIComponent(chan.channel)}`
+
+  fetch(url, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: { 'Content-Type': 'application/json' }
+  })
+  .then(() => msg.set(''))
+}
 
 ReactDOM.render(
   <Channels chans={channels} />,
@@ -119,7 +147,7 @@ ReactDOM.render(
   document.getElementById('messages-area'))
 
 ReactDOM.render(
-  <Input />,
+  <Input currentChan={currentChannel} />,
   document.getElementById('input-area'))
 
 ReactDOM.render(
