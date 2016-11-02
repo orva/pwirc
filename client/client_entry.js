@@ -114,7 +114,7 @@ const Input = ({ currentChan }) => { // eslint-disable-line no-unused-vars
     msg: ''
   })
 
-  return <input className="message-input"
+  return <input className="input"
     value={ state.view('msg') }
     onInput={ e => state.view('msg').set(e.target.value) }
     onKeyPress={keypressHandler(state, currentChan)} />

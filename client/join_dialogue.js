@@ -11,7 +11,7 @@ const JoinDialogue = ({ isOpen, serverList }) =>  { // eslint-disable-line no-un
 
   return <div className={K(isOpen, joinModalClasses)}>
     <h4 className="modal-h4">Channel name:</h4>
-    <input className="channel-input"
+    <input className="input"
       onChange={ev => state.view('channel').set(ev.target.value)} />
 
     <h4 className="modal-h4">Select server:</h4>
