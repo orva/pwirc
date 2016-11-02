@@ -6,6 +6,7 @@ const K = require('karet.util').default
 const L = require('partial.lenses')
 const R = require('ramda')
 
+const shared = require('./shared')
 const JoinDialogue = require('./join_dialogue') // eslint-disable-line no-unused-vars
 
 const root = Atom({
@@ -24,8 +25,6 @@ const root = Atom({
   }
 })
 
-root.log('root')
-
 const messages = root.view('messages')
 const channels = root.view(
   'channels',
@@ -33,7 +32,8 @@ const channels = root.view(
 
 const currentChannel = root.view('currentChannel')
 const servers = root.view('servers')
-const joinOpen = root.lens('openModals', 'join')
+const joinDialogueOpen = root.view('openModals', 'join')
+
 
 const sock = io.connect()
 sock.on('channel-switched', ({lines, server, channel}) => {
@@ -51,7 +51,7 @@ sock.on('welcome', () => {
 })
 
 
-const Messages = ({msgs}) => // eslint-disable-line no-unused-vars
+const Messages = ({ msgs }) => // eslint-disable-line no-unused-vars
   <ul className="messages">
     {K(msgs, R.map(({key, time, user, msg}) =>
       <li key={key} className="messages-msg">
@@ -85,19 +85,18 @@ const leftPad = (paddedLength, padder, str) => {
     str)
 }
 
-const dashedKey = parts => R.join('', R.intersperse('-', R.reject(R.isNil, parts)))
 
-const Channels = ({chans}) => // eslint-disable-line no-unused-vars
+const Channels = ({ chans }) => // eslint-disable-line no-unused-vars
   <div className="sidepanel">
     <h3 className="sidepanel-header">
       Channels
       <a title="Join to a new channel">
         <i className="sidepanel-header-glyph fa fa-plus-circle"
-           onClick={() => joinOpen.set(true)}></i>
+           onClick={() => joinDialogueOpen.set(true)}></i>
       </a>
     </h3>
     <ul className="channels">
-      {K(chans, R.map(({channel, server, key=dashedKey([channel, server])}) =>
+      {K(chans, R.map(({channel, server, key=shared.dashedKey([channel, server])}) =>
         <li key={key} className="channels-chan" onClick={switchChannel(channel)}>
           {channel}
         </li>))}
@@ -109,7 +108,8 @@ const switchChannel = channel => e => {
   sock.emit('switch', channel)
 }
 
-const Input = ({currentChan}) => { // eslint-disable-line no-unused-vars
+
+const Input = ({ currentChan }) => { // eslint-disable-line no-unused-vars
   const state = Atom({
     msg: ''
   })
@@ -125,10 +125,13 @@ const keypressHandler = (state, currentChan) => e => {
     return
   }
 
-  const chan = currentChan.get()
+  const chanData = currentChan.get()
+  const server = encodeURIComponent(chanData.server)
+  const channel = encodeURIComponent(chanData.channel)
+  const url = `/messages/${server}/${channel}`
+
   const msg = state.view('msg')
   const payload = { msg: msg.get() }
-  const url = `/messages/${chan.server}/${encodeURIComponent(chan.channel)}`
 
   fetch(url, {
     method: 'POST',
@@ -137,6 +140,7 @@ const keypressHandler = (state, currentChan) => e => {
   })
   .then(() => msg.set(''))
 }
+
 
 ReactDOM.render(
   <Channels chans={channels} />,
@@ -151,5 +155,5 @@ ReactDOM.render(
   document.getElementById('input-area'))
 
 ReactDOM.render(
-  <JoinDialogue join={joinOpen} serverList={servers} />,
+  <JoinDialogue isOpen={joinDialogueOpen} serverList={servers} />,
   document.getElementById('modal-area'))
