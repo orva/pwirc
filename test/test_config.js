@@ -21,7 +21,8 @@ describe('Config', function() {
       .tap(defs => {
         that.defaults = JSON.parse(defs)
       })
-      .then(fs.writeFileAsync(that.filename, jsonStr, 'utf8'))
+      .then(() => fs.unlinkAsync(that.filename).catch(() => undefined))
+      .then(() => fs.writeFileAsync(that.filename, jsonStr, 'utf8'))
   })
 
   afterEach(function() {
@@ -29,36 +30,33 @@ describe('Config', function() {
   })
 
   describe('load', function() {
-    it('gives default configuration when file does not exist', function(done) {
+    it('gives default configuration when file does not exist', function() {
       const that = this
 
-      config.load('/tmp/does-not-exist')
+      return config.load('/tmp/does-not-exist')
         .then(conf => {
           should.deepEqual(conf, that.defaults)
-          done()
         })
     })
 
-    it('gives default configuration when file contains garbage', function(done) {
+    it('gives default configuration when file contains garbage', function() {
       const that = this
 
-      fs.writeFileAsync(that.filename, '{{}-----', 'utf8')
+      return fs.writeFileAsync(that.filename, '{{}-----', 'utf8')
         .then(() => {
           return config.load(that.filename)
         })
         .then(conf => {
           should.deepEqual(conf, that.defaults)
-          done()
         })
     })
 
-    it('gives contents of the file if it exists', function(done) {
+    it('gives contents of the file if it exists', function() {
       const that = this
 
-      config.load(that.filename)
+      return config.load(that.filename)
         .then(conf => {
           should.deepEqual(conf, that.configs)
-          done()
         })
     })
   })
@@ -74,7 +72,6 @@ describe('Config', function() {
         .then(rawJson => {
           should.deepEqual(that.configs, JSON.parse(rawJson))
         })
-        .should.be.fulfilled()
     })
   })
 })
