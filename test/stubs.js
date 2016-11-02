@@ -1,5 +1,5 @@
-import EventEmitter from 'events'
-import * as R from 'ramda'
+const EventEmitter = require('events')
+const R = require('ramda')
 
 export function server() {
   return {
@@ -57,7 +57,24 @@ export function config() {
     servers: {
       freenode: ['chat.freenode.net'],
       mozilla: ['irc.mozilla.org'],
-      quakenet: ['irc.quakenet.org']
+      quakenet: ['irc.quakenet.org'],
+      rizon: ['irc.rizon.net'],
+      ircnet: [
+        'irc.cs.hut.fi',
+        'irc.lut.fi',
+        'irc.elisa.fi',
+        'irc.nebula.fi',
+        'irc.snt.utwente.nl',
+        'hub.snt.utwente.nl'
+      ]
     }
   }
+}
+
+module.exports = {
+  server,
+  channelsList,
+  messages,
+  initialState,
+  config
 }

@@ -171,7 +171,16 @@ describe('Routes', function() {
           available: {
             freenode: ['chat.freenode.net'],
             mozilla: ['irc.mozilla.org'],
-            quakenet: ['irc.quakenet.org']
+            quakenet: ['irc.quakenet.org'],
+            rizon: ['irc.rizon.net'],
+            ircnet: [
+              'irc.cs.hut.fi',
+              'irc.lut.fi',
+              'irc.elisa.fi',
+              'irc.nebula.fi',
+              'irc.snt.utwente.nl',
+              'hub.snt.utwente.nl'
+            ]
           }
         })
         .expect(200, done)
