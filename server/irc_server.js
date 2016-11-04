@@ -4,7 +4,7 @@ const R = require('ramda')
 const irc = require('irc')
 const uuid = require('uuid')
 
-function connect(name, url, nick, opts) {
+const connect = (name, url, nick, opts) => {
   const server = {
     name: name,
     serverUrl: url,
@@ -16,7 +16,7 @@ function connect(name, url, nick, opts) {
   return server
 }
 
-function join(server, channel, cb) {
+const join = (server, channel, cb) => {
   if (!server || !channel || R.contains(channel, channels(server)) ||
       !isChannelName(server, channel)) {
     return
@@ -25,15 +25,13 @@ function join(server, channel, cb) {
   server.irc.join(channel, cb)
 }
 
-function say(target, msg, server) {
+const say = (target, msg, server) =>
   server.irc.say(target, msg)
-}
 
-function messages(channel, server) {
-  return R.filter(R.propEq('to', channel), server.allMessages)
-}
+const messages = (channel, server) =>
+  R.filter(R.propEq('to', channel), server.allMessages)
 
-function channels(server) {
+const channels = server => {
   if (!server) {
     return []
   }
@@ -41,7 +39,7 @@ function channels(server) {
   return R.keys(server.irc.chans)
 }
 
-function isChannelName(server, name) {
+const isChannelName = (server, name) => {
   const chanPrefixes = R.split('', server.irc.supported.channel.types)
   const escaper = R.map(pref => '\\' + pref)
   const escapedChanPrefixes = R.join('', escaper(chanPrefixes))
@@ -50,7 +48,7 @@ function isChannelName(server, name) {
 }
 
 
-function setupServerEventListeners(server) {
+const setupServerEventListeners = server => {
   server.irc.addListener('error', err => {
     console.log('error', err)
   })
@@ -75,16 +73,14 @@ function setupServerEventListeners(server) {
   })
 }
 
-function createMessageObject(serverUrl, from, to, msg) {
-  return {
-    time: new Date(),
-    key: uuid.v4(),
-    server: serverUrl,
-    user: from,
-    to: to,
-    msg: msg
-  }
-}
+const createMessageObject = (serverUrl, from, to, msg) => ({
+  time: new Date(),
+  key: uuid.v4(),
+  server: serverUrl,
+  user: from,
+  to: to,
+  msg: msg
+})
 
 module.exports = {
   connect,

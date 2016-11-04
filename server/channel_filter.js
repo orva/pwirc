@@ -15,7 +15,7 @@ listeners to correct places.
 
 */
 
-function create(state) {
+const create = state => {
   const server = R.head(state.servers)
   const channel = R.head(irc.channels(server))
 
@@ -31,10 +31,11 @@ function create(state) {
   const listeners = setupChannelEventlEmitters(session)
   session.listeners = listeners
   session.stateListeners = stateListeners
+
   return session
 }
 
-function close(session) {
+const close = session => {
   removeStateListeners(session)
   removeChannelEventListeners(session)
   session.listeners = undefined
@@ -42,7 +43,7 @@ function close(session) {
   session.server = undefined
 }
 
-function switchChannel(session, chan) {
+const switchChannel = (session, chan) => {
   const allChannels = servers.allChannels(session.state)
   const targetChan = R.find(R.equals(chan), allChannels)
 
@@ -65,7 +66,7 @@ function switchChannel(session, chan) {
 }
 
 
-function initialState(session) {
+const initialState = session => {
   if (!session.server) {
     return { lines: [], server: undefined, channel: undefined }
   }
@@ -77,7 +78,7 @@ function initialState(session) {
   }
 }
 
-function setupChannelEventlEmitters(session) {
+const setupChannelEventlEmitters = session => {
   if (!session.server) {
     return
   }
@@ -95,7 +96,7 @@ function setupChannelEventlEmitters(session) {
   return listeners
 }
 
-function setupStateEventListeners(session) {
+const setupStateEventListeners = session => {
   const add = srv => {
     if (!session.server) {
       session.server = srv
@@ -112,7 +113,7 @@ function setupStateEventListeners(session) {
   return listeners
 }
 
-function removeChannelEventListeners(session) {
+const removeChannelEventListeners = session => {
   if (!session.server) {
     return
   }
@@ -124,7 +125,7 @@ function removeChannelEventListeners(session) {
   session.listeners = undefined
 }
 
-function removeStateListeners(session) {
+const removeStateListeners = session => {
   if (!session.state) {
     return
   }

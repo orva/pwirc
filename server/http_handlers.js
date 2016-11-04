@@ -139,12 +139,10 @@ config.load(configFile)
     console.log('server started, port 31337')
   })
 
-function reconnectIrcServer(con) {
-  return irc.connect(con.serverName, con.serverUrl, con.nick,
-    { channels: con.channels})
-}
+const reconnectIrcServer = ({ serverName, serverUrl, nick, channels }) =>
+  irc.connect(serverName, serverUrl, nick, { channels })
 
-function serverBroadcasts(sockIO, server) {
+const serverBroadcasts = (sockIO, server) => {
   server.events.on('channel-joined', () => {
     sockIO.emit('channels-updated', serverState.allChannels(servers))
   })
