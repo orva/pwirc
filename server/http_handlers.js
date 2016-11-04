@@ -106,10 +106,22 @@ io.on('connection', sock => {
   })
 
   sock.emit('channels-updated', serverState.allChannels(servers))
-  sock.emit('channel-switched', channel.initialState(session))
+
+  const initialState = channel.initialState(session)
+  if (initialStateIsStable(initialState)) {
+    sock.emit('channel-switched', initialState)
+  }
+
   sock.emit('welcome')
 })
 
+const initialStateIsStable = state => {
+  const exists = R.pipe(
+    R.complement(R.isNil),
+    R.complement(R.isEmpty)
+  )
+  return !R.isEmpty(state) && exists(state.server) && exists(state.channel)
+}
 
 
 config.load(configFile)
