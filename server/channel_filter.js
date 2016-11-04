@@ -2,6 +2,7 @@ const EventEmitter = require('events')
 const R = require('ramda')
 
 const irc = require('./irc_server')
+const servers = require('./irc_server_state')
 
 /*
 
@@ -41,11 +42,26 @@ function close(session) {
   session.server = undefined
 }
 
-function switchChannel(session, channel) {
-  if (R.contains(channel, irc.channels(session.server))) {
-    session.channel = channel
+function switchChannel(session, chan) {
+  const allChannels = servers.allChannels(session.state)
+  const targetChan = R.find(R.equals(chan), allChannels)
+
+  if (!targetChan) {
+    return
+  }
+
+  if (session.server.name === targetChan.server) {
+    session.channel = targetChan.channel
     return initialState(session)
   }
+
+  const server = servers.find(session.state, targetChan.server)
+  removeChannelEventListeners(session)
+  session.server = server
+  session.channel = targetChan.channel
+  setupChannelEventlEmitters(session)
+
+  return initialState(session)
 }
 
 
@@ -104,6 +120,8 @@ function removeChannelEventListeners(session) {
   R.forEach(listener => {
     session.server.events.removeListener(listener.type, listener.callback)
   }, session.listeners)
+
+  session.listeners = undefined
 }
 
 function removeStateListeners(session) {
@@ -114,6 +132,8 @@ function removeStateListeners(session) {
   R.forEach(listener => {
     session.state.events.removeListener(listener.type, listener.callback)
   }, session.stateListeners)
+
+  session.stateListeners = undefined
 }
 
 module.exports = {

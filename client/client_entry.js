@@ -82,7 +82,8 @@ const leftPad = (paddedLength, padder, str) => {
   const padAmount = paddedLength - str.length
   return R.concat(
     R.join('', R.repeat(padder, padAmount)),
-    str)
+    str
+  )
 }
 
 
@@ -97,15 +98,15 @@ const Channels = ({ chans }) => // eslint-disable-line no-unused-vars
     </h3>
     <ul className="channels">
       {K(chans, R.map(({channel, server, key=shared.dashedKey([channel, server])}) =>
-        <li key={key} className="channels-chan" onClick={switchChannel(channel)}>
+        <li key={key} className="channels-chan" onClick={switchChannel(channel, server)}>
           {channel}
         </li>))}
     </ul>
   </div>
 
-const switchChannel = channel => e => {
+const switchChannel = (channel, server) => e => {
   e.preventDefault()
-  sock.emit('switch', channel)
+  sock.emit('switch', { channel, server })
 }
 
 

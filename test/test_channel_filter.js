@@ -16,15 +16,27 @@ describe('ChannelFilter', () => {
     const ircStub = {}
     ircStub.channels = sinon.stub().returns(['#first', '#second'])
 
+    const serverStateStub = {}
+    serverStateStub.allChannels = sinon.stub().returns([
+      { channel: '#first', server: 'freenode' },
+      { channel: '#second', server: 'freenode' },
+      { channel: '#third', server: 'quakenet' }
+    ])
+
+
     const stateStub = {
       servers: [stubs.server()],
-      events: new EventEmitter()
+      events: new EventEmitter(),
     }
 
     this.stateStub = stateStub
     this.ircStub = ircStub
+    this.serverStateStub = serverStateStub
 
-    this.channel = proxyquire(channelPath, { './irc_server': this.ircStub })
+    this.channel = proxyquire(channelPath, {
+      './irc_server': this.ircStub,
+      './irc_server_state': this.serverStateStub
+    })
   })
 
   describe('create', function() {
@@ -115,7 +127,7 @@ describe('ChannelFilter', () => {
   describe('switchChannel', function() {
     it('changes current channel', function() {
       const c = this.channel.create(this.stateStub)
-      should.ok(this.channel.switchChannel(c, '#second'))
+      should.ok(this.channel.switchChannel(c, { channel: '#second', server: 'freenode' }))
       should.equal(c.channel, '#second')
     })
 
@@ -126,13 +138,19 @@ describe('ChannelFilter', () => {
 
     it('returns expected initial state for new channel', function() {
       const c = this.channel.create(this.stateStub)
-      const ret = this.channel.switchChannel(c, '#second')
+      const ret = this.channel.switchChannel(c, { channel: '#second', server: 'freenode' })
       const expected = {
         server: 'freenode',
         channel: '#second',
         lines: R.filter(R.propEq('to', '#second'), c.server.allMessages)
       }
       should.deepEqual(ret, expected)
+    })
+
+    it('does not switch to channel with same name but in different server', function() {
+      const c = this.channel.create(this.stateStub)
+      const ret = this.channel.switchChannel(c, { channel: '#third', server: 'freenode' })
+      should.not.exist(ret)
     })
   })
 
