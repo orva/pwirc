@@ -6,8 +6,11 @@ const R = require('ramda')
 const shared = require('./shared')
 
 
-const JoinDialogue = ({ isOpen, serverList }) =>  { // eslint-disable-line no-unused-vars
+const JoinDialogue = ({ isOpen }) =>  { // eslint-disable-line no-unused-vars
   const state = Atom(emptyState())
+  const serverlist = state.view('servers')
+
+  isOpen.onValue(refreshServersWhenOpened(serverlist))
 
   return <div className={K(isOpen, joinModalClasses)}>
     <h4 className="modal-h4">Channel name:</h4>
@@ -17,7 +20,7 @@ const JoinDialogue = ({ isOpen, serverList }) =>  { // eslint-disable-line no-un
     <h4 className="modal-h4">Select server:</h4>
     <dl className="serverlist">
       <dt className="serverlist-term">Connected servers:</dt>
-      {K(serverList.view('connected'), R.map(({name, serverUrl}) =>
+      {K(serverlist.view('connected'), R.map(({name, serverUrl}) =>
         <ServerEntry name={name}
           state={state}
           key={shared.dashedKey([name, serverUrl])}
@@ -25,7 +28,7 @@ const JoinDialogue = ({ isOpen, serverList }) =>  { // eslint-disable-line no-un
           clickHandler={() => state.view('server').set(name)} />))}
 
       <dt className="serverlist-term">Available servers:</dt>
-      {K(serverList, srv => availableServers(state, srv))}
+      {K(serverlist, srv => availableServers(state, srv))}
     </dl>
 
     <button id="cancel-join-channel-btn"
@@ -51,7 +54,14 @@ const ServerEntry = ({ name, serverUrl, clickHandler, state }) => // eslint-disa
   </dd>
 
 
-const emptyState = () => ({channel: '', server: ''})
+const emptyState = () => ({
+  channel: '',
+  server: '',
+  servers: {
+    connected: [],
+    available: {}
+  }
+})
 
 const joinModalClasses = open =>
   open ? 'modal modal-join' : 'modal modal-join modal--hidden'
@@ -60,6 +70,16 @@ const serverlistItenClasses = (state, server) =>
   R.equals(server, state.server)
     ? 'serverlist-item serverlist-item--selected'
     : 'serverlist-item'
+
+const refreshServersWhenOpened = serverlist => isOpen => {
+  if (!isOpen) {
+    return
+  }
+
+  fetch('/servers')
+    .then(res => res.json())
+    .then(res => serverlist.set(res))
+}
 
 const availableServers = (state, { available, connected }) => {
   const pipe = R.pipe(

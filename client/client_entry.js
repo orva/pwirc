@@ -18,10 +18,6 @@ const root = Atom({
   },
   openModals: {
     join: false
-  },
-  servers: {
-    connected: [],
-    available: {},
   }
 })
 
@@ -31,7 +27,6 @@ const channels = root.view(
   L.normalize(R.sortBy(R.prop('channel'))))
 
 const currentChannel = root.view('currentChannel')
-const servers = root.view('servers')
 const joinDialogueOpen = root.view('openModals', 'join')
 
 
@@ -43,10 +38,6 @@ sock.on('channel-switched', ({lines, server, channel}) => {
 sock.on('channels-updated', chans => channels.set(chans))
 sock.on('message', msg => messages.modify(R.append(msg)))
 sock.on('welcome', () => {
-  fetch('/servers')
-    .then(res => res.json())
-    .then(res => servers.set(res))
-
   console.log('welcome')
 })
 
@@ -156,5 +147,5 @@ ReactDOM.render(
   document.getElementById('input-area'))
 
 ReactDOM.render(
-  <JoinDialogue isOpen={joinDialogueOpen} serverList={servers} />,
+  <JoinDialogue isOpen={joinDialogueOpen} />,
   document.getElementById('modal-area'))
