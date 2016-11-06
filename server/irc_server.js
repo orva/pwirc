@@ -5,6 +5,7 @@ const irc = require('irc')
 const uuid = require('uuid')
 
 const connect = (name, url, nick, opts) => {
+  // TODO promisify
   const server = {
     name: name,
     serverUrl: url,
@@ -50,6 +51,7 @@ const isChannelName = (server, name) => {
 
 const setupServerEventListeners = server => {
   server.irc.addListener('error', err => {
+    // TODO server-disconnected event
     console.log('error', err)
   })
 

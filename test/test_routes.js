@@ -187,4 +187,102 @@ describe('Routes', function() {
 
     })
   })
+
+  describe('POST /servers', function() {
+    it('responds with 202 when it starts connecting to server', function(done) {
+      request(this.app)
+        .post('/servers')
+        .send({
+          name: 'quakenet',
+          serverUrl: 'irc.quakenet.org',
+          personality: {
+            nick: 'orvari2',
+            realName: 'pwirc-test-user'
+          },
+          channels: ['#pwirc-quakenet-testing-1']
+        })
+        .expect(202, done)
+    })
+
+    it('responds with 400 when "name" is missing', function(done) {
+      request(this.app)
+        .post('/servers')
+        .send({
+          serverUrl: 'irc.quakenet.org',
+          personality: {
+            nick: 'orvari2',
+            realName: 'pwirc-test-user'
+          },
+          channels: ['#pwirc-quakenet-testing-1']
+        })
+        .expect(400, done)
+    })
+
+    it('responds with 400 when "serverUrl" is missing', function(done) {
+      request(this.app)
+        .post('/servers')
+        .send({
+          name: 'quakenet',
+          personality: {
+            nick: 'orvari2',
+            realName: 'pwirc-test-user'
+          },
+          channels: ['#pwirc-quakenet-testing-1']
+        })
+        .expect(400, done)
+    })
+
+    it('responds with 400 when "personality" is missing', function(done) {
+      request(this.app)
+        .post('/servers')
+        .send({
+          name: 'quakenet',
+          serverUrl: 'irc.quakenet.org',
+          channels: ['#pwirc-quakenet-testing-1']
+        })
+        .expect(400, done)
+    })
+
+    it('responds with 400 when "personality.nick" is missing', function(done) {
+      request(this.app)
+        .post('/servers')
+        .send({
+          name: 'quakenet',
+          serverUrl: 'irc.quakenet.org',
+          personality: {
+            realName: 'pwirc-test-user'
+          },
+          channels: ['#pwirc-quakenet-testing-1']
+        })
+        .expect(400, done)
+    })
+
+    it('responds with 400 when "personality.realName" is missing', function(done) {
+      request(this.app)
+        .post('/servers')
+        .send({
+          name: 'quakenet',
+          serverUrl: 'irc.quakenet.org',
+          personality: {
+            nick: 'orvari2'
+          },
+          channels: ['#pwirc-quakenet-testing-1']
+        })
+        .expect(400, done)
+    })
+
+    it('responds with 400 when "channels" is missing', function(done) {
+      request(this.app)
+        .post('/servers')
+        .send({
+          name: 'quakenet',
+          serverUrl: 'irc.quakenet.org',
+          personality: {
+            nick: 'orvari2',
+            realName: 'pwirc-test-user'
+          }
+        })
+        .expect(400, done)
+    })
+  })
 })

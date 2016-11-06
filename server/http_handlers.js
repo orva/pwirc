@@ -87,6 +87,28 @@ app.get('/servers', (req, res) => {
     })
 })
 
+app.post('/servers', ({ body: { name, serverUrl, personality, channels } }, res) => {
+  if (!exists(personality)) {
+    res.status(400).end()
+    return
+  }
+
+  const { nick, realName } = personality
+
+  if (!exists(name) || !exists(serverUrl) || !exists(nick) || !exists(realName) || !exists(channels)) {
+    res.status(400).end()
+    return
+  }
+
+  const srv = irc.connect(name, serverUrl, nick, {
+    channels,
+    realName,
+    userName: nick
+  })
+  res.status(202).end()
+  serverState.add(servers, srv)
+})
+
 
 io.on('connection', sock => {
   const session = channel.create(servers)
@@ -95,7 +117,6 @@ io.on('connection', sock => {
     channel.close(session)
   })
 
-  // TODO: enable siwtching channels in different server
   sock.on('switch', chan => {
     const state = channel.switchChannel(session, chan)
     sock.emit('channel-switched', state)
@@ -115,14 +136,10 @@ io.on('connection', sock => {
   sock.emit('welcome')
 })
 
-const initialStateIsStable = state => {
-  const exists = R.pipe(
-    R.complement(R.isNil),
-    R.complement(R.isEmpty)
-  )
-  return !R.isEmpty(state) && exists(state.server) && exists(state.channel)
-}
+const initialStateIsStable = state =>
+  (!R.isEmpty(state) && exists(state.server) && exists(state.channel))
 
+const exists = v => (!R.isNil(v) && !R.isEmpty(v))
 
 config.load(configFile)
   .then(conf => {
