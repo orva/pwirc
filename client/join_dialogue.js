@@ -20,15 +20,10 @@ const JoinDialogue = ({ isOpen }) =>  { // eslint-disable-line no-unused-vars
     <h4 className="modal-h4">Select server:</h4>
     <dl className="serverlist">
       <dt className="serverlist-term">Connected servers:</dt>
-      {K(serverlist.view('connected'), R.map(({name, serverUrl}) =>
-        <ServerEntry name={name}
-          state={state}
-          key={shared.dashedKey([name, serverUrl])}
-          serverUrl={serverUrl}
-          clickHandler={() => state.view('server').set(name)} />))}
+      {K(serverlist.view('connected'), connectedServers(state))}
 
       <dt className="serverlist-term">Available servers:</dt>
-      {K(serverlist, srv => availableServers(state, srv))}
+      {K(serverlist, availableServers(state))}
     </dl>
 
     <button id="cancel-join-channel-btn"
@@ -81,7 +76,14 @@ const refreshServersWhenOpened = serverlist => isOpen => {
     .then(res => serverlist.set(res))
 }
 
-const availableServers = (state, { available, connected }) => {
+const connectedServers = state => R.map(({name, serverUrl}) =>
+  <ServerEntry name={name}
+    state={state}
+    key={shared.dashedKey([name, serverUrl])}
+    serverUrl={serverUrl}
+    clickHandler={() => state.view('server').set(name)} />)
+
+const availableServers = state => ({ available, connected }) => {
   const pipe = R.pipe(
     filterOutConnected(connected),
     flattenAvailableServers,
