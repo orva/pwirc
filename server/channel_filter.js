@@ -60,7 +60,7 @@ const switchChannel = (session, chan) => {
   removeChannelEventListeners(session)
   session.server = server
   session.channel = targetChan.channel
-  setupChannelEventlEmitters(session)
+  session.listeners = setupChannelEventlEmitters(session)
 
   return initialState(session)
 }
@@ -118,11 +118,13 @@ const removeChannelEventListeners = session => {
     return
   }
 
+  const listeners = session.listeners
+  session.listeners = []
+
   R.forEach(listener => {
     session.server.events.removeListener(listener.type, listener.callback)
-  }, session.listeners)
+  }, listeners)
 
-  session.listeners = undefined
 }
 
 const removeStateListeners = session => {
@@ -130,11 +132,12 @@ const removeStateListeners = session => {
     return
   }
 
+  const stateListeners = session.stateListeners
+  session.stateListeners = []
+
   R.forEach(listener => {
     session.state.events.removeListener(listener.type, listener.callback)
-  }, session.stateListeners)
-
-  session.stateListeners = undefined
+  }, stateListeners)
 }
 
 module.exports = {
