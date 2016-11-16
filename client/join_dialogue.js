@@ -107,7 +107,7 @@ const connectedServers = state => R.map(({name, serverUrl}) =>
     state={state}
     key={shared.dashedKey([name, serverUrl])}
     serverUrl={serverUrl}
-    clickHandler={() => state.view('server').set(name)} />)
+    clickHandler={connectedServerClickHandler(state, name)} />)
 
 const availableServers = state => ({ available, connected }) => {
   const pipe = R.pipe(
@@ -142,6 +142,18 @@ const flattenAvailableServers = R.pipe(
     return R.zipWith(addKey, indices, servers)
   }
 )
+
+const connectedServerClickHandler = (state, server) => () => {
+  const connected = state.view('servers', 'connected').get()
+  const serverInfo = R.find(R.propEq('name', server), connected)
+
+  state.modify(s => R.merge(s, {
+    requiresServerConnect: false,
+    nick: serverInfo.nick,
+    realName: serverInfo.realName,
+    server,
+  }))
+}
 
 const availableServerClickHandler = (state, server, serverUrl) => () =>
   state.modify(s => R.merge(s, {
