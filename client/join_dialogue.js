@@ -38,15 +38,14 @@ const JoinDialogue = ({ isOpen }) =>  { // eslint-disable-line no-unused-vars
       onChange={ev => state.view('realName').set(ev.target.value)} />
 
 
-    <button id="cancel-join-channel-btn"
-            className="button modal-button modal-button-cancel"
-            onClick={closeDialogue(state, isOpen)}>
+    <button
+      className="button modal-button modal-button-cancel"
+      onClick={closeDialogue(state, isOpen)}>
       Cancel
     </button>
 
     {K(state, s =>
-      <button id="join-channel-btn"
-        className="button modal-button modal-button-action"
+      <button className="button modal-button modal-button-action"
         disabled={cannotJoinYet(s)}
         onClick={joinButtonHandler(state, isOpen)} >
         Join channel
