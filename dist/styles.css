@@ -61,6 +61,7 @@ body {
 
 
 .input {
+  font-family: inherit;
   font-size: 1em;
   line-height: 1.3em;
 
@@ -74,6 +75,11 @@ body {
 .input:focus {
   outline: none;
 }
+
+.button {
+  font-family: inherit;
+}
+
 
 .sidepanel {
   display: flex;
