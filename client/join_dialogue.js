@@ -15,6 +15,8 @@ const JoinDialogue = ({ isOpen }) =>  { // eslint-disable-line no-unused-vars
   return <div className={K(isOpen, joinModalClasses)}>
     <h4 className="modal-h4">Channel name:</h4>
     <input className="input"
+      placeholder="#channelname"
+      value={state.view('channel')}
       onChange={ev => state.view('channel').set(ev.target.value)} />
 
     <h4 className="modal-h4">Select server:</h4>
@@ -26,32 +28,49 @@ const JoinDialogue = ({ isOpen }) =>  { // eslint-disable-line no-unused-vars
       {K(serverlist, availableServers(state))}
     </dl>
 
+    <h4 className="modal-h4">Personality</h4>
+    <input className="input"
+      value={state.view('nick')}
+      disabled={K(state.view('requiresServerConnect'), rsc => !rsc)}
+      placeholder="nick name"
+      onChange={ev => state.view('nick').set(ev.target.value)} />
+    <input className="input"
+      value={state.view('realName')}
+      disabled={K(state.view('requiresServerConnect'), rsc => !rsc)}
+      placeholder="real name"
+      onChange={ev => state.view('realName').set(ev.target.value)} />
+
+
     <button id="cancel-join-channel-btn"
             className="modal-button modal-button-cancel"
             onClick={closeDialogue(state, isOpen)}>
       Cancel
     </button>
 
-    {K(state, ({ channel, server }) =>
+    {K(state, s =>
       <button id="join-channel-btn"
         className="modal-button modal-button-action"
-        disabled={R.isEmpty(channel) || R.isEmpty(server)}
-        onClick={joinChannel(state, isOpen)} >
+        disabled={cannotJoinYet(s)}
+        onClick={joinButtonHandler(state, isOpen)} >
         Join channel
       </button>)}
   </div>
 }
 
 const ServerEntry = ({ name, serverUrl, clickHandler, state }) => // eslint-disable-line no-unused-vars
-  <dd className={K(state, s => serverlistItenClasses(s, name))}
+  <dd className={K(state, s => serverlistItemClasses(s, name, serverUrl))}
       onClick={clickHandler} >
     {name}<span className="serverlist-item-url">{serverUrl}</span>
   </dd>
 
 
 const emptyState = () => ({
+  requiresServerConnect: false,
   channel: '',
   server: '',
+  serverUrl: '',
+  nick: '',
+  realName: '',
   servers: {
     connected: [],
     available: {}
@@ -61,10 +80,20 @@ const emptyState = () => ({
 const joinModalClasses = open =>
   open ? 'modal modal-join' : 'modal modal-join modal--hidden'
 
-const serverlistItenClasses = (state, server) =>
-  R.equals(server, state.server)
-    ? 'serverlist-item serverlist-item--selected'
-    : 'serverlist-item'
+const serverlistItemClasses = (state, server, serverUrl) => {
+  const normalClasses = 'serverlist-item'
+  const selectedClasses = 'serverlist-item serverlist-item--selected'
+
+  if (state.requiresServerConnect) {
+    return R.equals(server, state.server) && R.equals(serverUrl, state.serverUrl)
+      ? selectedClasses
+      : normalClasses
+  } else {
+    return R.equals(server, state.server)
+      ? selectedClasses
+      : normalClasses
+  }
+}
 
 const refreshServersWhenOpened = serverlist => isOpen => {
   if (!isOpen) {
@@ -92,7 +121,7 @@ const availableServers = state => ({ available, connected }) => {
         state={state}
         key={key}
         serverUrl={serverUrl}
-        clickHandler={() => undefined}/>
+        clickHandler={availableServerClickHandler(state, name, serverUrl)}/>
     ))
 
   return pipe(available)
@@ -117,7 +146,29 @@ const flattenAvailableServers = R.pipe(
   }
 )
 
-const joinChannel = (state, isOpen) => () => {
+const availableServerClickHandler = (state, server, serverUrl) => () =>
+  state.modify(s => R.merge(s, {
+    requiresServerConnect: true,
+    server,
+    serverUrl
+  }))
+
+const cannotJoinYet = state => {
+  return state.requiresServerConnect
+    ? !state.channel || !state.server || !state.serverUrl || !state.nick
+    : !state.channel || !state.server
+}
+
+const joinButtonHandler = (state, isOpen) => () => {
+  const connectRequired = state.view('requiresServerConnect').get()
+  if (connectRequired) {
+    connectServerAndJoinChannel(state, isOpen)
+  } else {
+    joinChannel(state, isOpen)
+  }
+}
+
+const joinChannel = (state, isOpen) => {
   const data = state.get()
   const server = encodeURIComponent(data.server)
   const channel = encodeURIComponent(data.channel)
@@ -129,6 +180,33 @@ const joinChannel = (state, isOpen) => () => {
       isOpen.set(false)
     })
 }
+
+const connectServerAndJoinChannel = (state, isOpen) => {
+  const data = state.get()
+
+  const payload = {
+    name: data.server,
+    serverUrl: data.serverUrl,
+    personality: {
+      nick: data.nick,
+      realName: data.realName || ''
+    },
+    channels: [data.channel]
+  }
+
+  fetch('/servers', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+  .then(() => {
+    state.set(emptyState())
+    isOpen.set(false)
+  })
+}
+
 
 const closeDialogue = (state, isOpen) => () => {
   isOpen.set(false)
