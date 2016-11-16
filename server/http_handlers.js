@@ -78,7 +78,7 @@ app.get('/channels/:server/:chan', (req, res) => {
 app.get('/servers', (req, res) => {
   config.load(configFile)
     .then(conf => {
-      const connected = R.map(R.pick(['name', 'serverUrl']), servers.servers)
+      const connected = R.map(R.pick(['name', 'serverUrl', 'nick', 'realName']), servers.servers)
       const available = conf.servers
       res.json({
         connected: connected,

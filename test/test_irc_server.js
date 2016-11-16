@@ -1,5 +1,6 @@
 const EventEmitter = require('events')
 const R = require('ramda')
+const Promise = require('bluebird')
 const sinon = require('sinon')
 const should = require('should')
 const proxyquire = require('proxyquire')
@@ -29,6 +30,28 @@ describe('IrcServer', function() {
 
     this.irc = proxyquire(ircPath, { 'irc': this.stubIrc })
     this.server = this.irc.connect.apply({}, this.connectArgs)
+  })
+
+  describe('nick', function() {
+    it('is set to the value from `irc.connect` parameters', function() {
+      should.equal(this.server.nick, 'test-user')
+    })
+
+    it('is updated from client `nick` events', function() {
+      const srv = this.server
+      this.client.emit('nick', 'test-user', 'second-test-user', ['#testing-1', '#testing-2'])
+
+      return Promise.delay(20)
+        .then(() => should.equal(srv.nick, 'second-test-user'))
+    })
+
+    it('other user changing nick do not affect `server.nick`', function() {
+      const srv = this.server
+      this.client.emit('nick', 'other-user', 'second-test-user', ['#testing-1', '#testing-2'])
+
+      return Promise.delay(20)
+        .then(() => should.equal(srv.nick, 'test-user'))
+    })
   })
 
   describe('connect', function() {

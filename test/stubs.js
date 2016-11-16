@@ -5,6 +5,8 @@ export function server() {
   return {
     serverUrl: 'chat.freenode.net',
     name: 'freenode',
+    nick: 'test-user',
+    realName: 'Testuser Name',
     events: new EventEmitter(),
     allMessages: messages(),
     irc: {

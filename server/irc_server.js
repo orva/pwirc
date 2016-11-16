@@ -8,6 +8,8 @@ const connect = (name, url, nick, opts) => {
   // TODO promisify
   const server = {
     name: name,
+    nick: nick,
+    realName: opts.realName || '',
     serverUrl: url,
     allMessages: [],
     irc: new irc.Client(url, nick, opts),
@@ -71,6 +73,12 @@ const setupServerEventListeners = server => {
   server.irc.addListener('join', (chan, nick) => {
     if (nick === server.irc.nick) {
       server.events.emit('channel-joined', chan)
+    }
+  })
+
+  server.irc.addListener('nick', (oldNick, newNick) => {
+    if (oldNick === server.nick) {
+      server.nick = newNick
     }
   })
 }

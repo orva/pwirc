@@ -167,7 +167,12 @@ describe('Routes', function() {
       request(this.app)
         .get('/servers')
         .expect({
-          connected: [ {name: 'freenode', serverUrl: 'chat.freenode.net'} ],
+          connected: [{
+            name: 'freenode',
+            serverUrl: 'chat.freenode.net',
+            nick: 'test-user',
+            realName: 'Testuser Name'
+          }],
           available: {
             freenode: ['chat.freenode.net'],
             mozilla: ['irc.mozilla.org'],
@@ -184,7 +189,6 @@ describe('Routes', function() {
           }
         })
         .expect(200, done)
-
     })
   })
 
