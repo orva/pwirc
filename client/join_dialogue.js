@@ -13,13 +13,11 @@ const JoinDialogue = ({ isOpen }) =>  { // eslint-disable-line no-unused-vars
   isOpen.onValue(refreshServersWhenOpened(serverlist))
 
   return <div className={K(isOpen, joinModalClasses)}>
-    <h4 className="modal-h4">Channel name:</h4>
-    <input className="input"
+    <input className="input modal-input"
       placeholder="#channelname"
       value={state.view('channel')}
       onChange={ev => state.view('channel').set(ev.target.value)} />
 
-    <h4 className="modal-h4">Select server:</h4>
     <dl className="serverlist">
       <dt className="serverlist-term">Connected servers:</dt>
       {K(serverlist.view('connected'), connectedServers(state))}
@@ -28,13 +26,12 @@ const JoinDialogue = ({ isOpen }) =>  { // eslint-disable-line no-unused-vars
       {K(serverlist, availableServers(state))}
     </dl>
 
-    <h4 className="modal-h4">Personality</h4>
-    <input className="input"
+    <input className="input modal-input"
       value={state.view('nick')}
       disabled={K(state.view('requiresServerConnect'), rsc => !rsc)}
       placeholder="nick name"
       onChange={ev => state.view('nick').set(ev.target.value)} />
-    <input className="input"
+    <input className="input modal-input"
       value={state.view('realName')}
       disabled={K(state.view('requiresServerConnect'), rsc => !rsc)}
       placeholder="real name"

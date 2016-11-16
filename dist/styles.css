@@ -162,7 +162,7 @@ body {
   left: 0px;
   right: 0px;
 
-  padding: 1em 2.5em;
+  padding: 2.5em;
 
   /* Magic 16em, seems to position quite nicely */
   top: calc(100% / 2 - 16em);
@@ -177,11 +177,6 @@ body {
   display: none;
 }
 
-.modal-h4 {
-  padding-left: 1em;
-  margin: 1.5em 0em 1em 0em;
-}
-
 .serverlist {
   border: 1px solid #dadada;
   border-radius: 3px;
@@ -189,6 +184,7 @@ body {
   height: 12em;
   overflow-y: auto;
   padding: 0.5em 0em;
+  margin: 0em 0em 1em 0em;
 }
 
 .serverlist-term {
@@ -223,10 +219,13 @@ body {
   background-color: #f0f0f0;
 }
 
+.modal-input {
+  margin: 0em 0em 1em 0em;
+}
+
 .modal-button {
   width: calc(50% - 0.5em);
-  height: 2.5em;
-  margin: 1.5em 0em 1.5em 0em;
+  height: 3em;
 
   background-color: white;
   border: 1px solid #dadada;
