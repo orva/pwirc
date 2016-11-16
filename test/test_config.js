@@ -73,5 +73,19 @@ describe('Config', function() {
           should.deepEqual(that.configs, JSON.parse(rawJson))
         })
     })
+
+    it('prettifyes the content', function() {
+      const that = this
+
+      return config.save(that.filename, that.configs)
+        .then(() => {
+          return fs.readFileAsync(that.filename, 'utf8')
+        })
+        .then(rawJson => {
+          const expected = JSON.stringify(that.configs, null, 2)
+          should.equal(rawJson, expected)
+        })
+
+    })
   })
 })

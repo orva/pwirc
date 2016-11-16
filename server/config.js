@@ -11,7 +11,7 @@ const load = filename =>
     .catch({code: 'ENOENT'}, () => defaults())
 
 const save = (filename, conf) => {
-  const jsonString = JSON.stringify(conf)
+  const jsonString = JSON.stringify(conf, null, 2)
   return fs.writeFileAsync(filename, jsonString, 'utf8')
 }
 
