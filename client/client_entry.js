@@ -136,16 +136,16 @@ const keypressHandler = (state, currentChan) => e => {
 
 ReactDOM.render(
   <Channels chans={channels} />,
-  document.getElementById('sidepanel-area'))
+  document.getElementsByClassName('sidepanel-area').item(0))
 
 ReactDOM.render(
   <Messages msgs={messages} />,
-  document.getElementById('messages-area'))
+  document.getElementsByClassName('messages-area').item(0))
 
 ReactDOM.render(
   <Input currentChan={currentChannel} />,
-  document.getElementById('input-area'))
+  document.getElementsByClassName('input-area').item(0))
 
 ReactDOM.render(
   <JoinDialogue isOpen={joinDialogueOpen} />,
-  document.getElementById('modal-area'))
+  document.getElementsByClassName('modal-area').item(0))
