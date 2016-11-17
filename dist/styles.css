@@ -52,7 +52,7 @@ body {
   .input-area {
     width: 100%;
     height: 4.5em;
-    padding: 1em 2em;
+    padding: 0px;
     margin: 0px;
   }
 }
@@ -60,13 +60,15 @@ body {
 @media all and (max-width: 55em) {
   .sidepanel-area {
     position: fixed;
-    transform: translateX(-100%);
+    transform: translateX(-150%);
     z-index: 1;
 
     width: 80%;
     height: 100%;
     padding: 0px;
     margin: 0px;
+
+    box-shadow: 0 0 1em #636363;
   }
 
   .content-area {
@@ -86,7 +88,7 @@ body {
   .input-area {
     width: 100%;
     height: 4.5em;
-    padding: 1em 2em;
+    padding: 0px;
     margin: 0px;
   }
 }
@@ -285,4 +287,41 @@ body {
 
 .modal-button-cancel {
   margin-right: 0.5em;
+}
+
+
+
+@media all and (max-width: 55em) {
+  .input-bar {
+    display: flex;
+    flex-flow: row nowrap;
+
+    padding: 1em 1em;
+    width: 100%;
+  }
+
+  .input-bar-menu-open-glyph {
+    cursor: pointer;
+    color: #636363;
+    margin-top: 0.12em;
+    font-size: 1.9em;
+  }
+
+  .input-bar-input {
+    margin-left: 1em;
+  }
+}
+
+@media all and (min-width: 55em) {
+  .input-bar {
+    display: flex;
+    flex-flow: row nowrap;
+
+    padding: 1em 2em;
+    width: 100%;
+  }
+
+  .input-bar-menu-open-glyph {
+    display: none;
+  }
 }

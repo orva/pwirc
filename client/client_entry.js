@@ -106,10 +106,16 @@ const Input = ({ currentChan }) => { // eslint-disable-line no-unused-vars
     msg: ''
   })
 
-  return <input className="input"
-    value={ state.view('msg') }
-    onInput={ e => state.view('msg').set(e.target.value) }
-    onKeyPress={keypressHandler(state, currentChan)} />
+  return <div className="input-bar">
+      <a title="Open sidepanel">
+        <i className="input-bar-menu-open-glyph fa fa-bars"
+          onClick={() => sidebarOpen.set(true)}></i>
+      </a>
+      <input className="input input-bar-input"
+        value={ state.view('msg') }
+        onInput={ e => state.view('msg').set(e.target.value) }
+        onKeyPress={keypressHandler(state, currentChan)} />
+    </div>
 }
 
 const keypressHandler = (state, currentChan) => e => {
