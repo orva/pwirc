@@ -167,6 +167,26 @@ body {
   color: #f0f0f0;
 }
 
+.controls {
+  height: auto;
+  width: 100%;
+}
+
+.control-link {
+  width: 100%;
+  cursor: pointer;
+  display: block;
+  padding: 1em;
+}
+
+.control-link:hover {
+  color: #f0f0f0;
+}
+
+.control-link-glyph {
+  padding-right: 1em;
+}
+
 
 
 .messages {

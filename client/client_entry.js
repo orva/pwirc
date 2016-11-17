@@ -86,10 +86,6 @@ const Channels = ({ chans }) => // eslint-disable-line no-unused-vars
   <div className="sidepanel">
     <h3 className="sidepanel-header">
       Channels
-      <a title="Join to a new channel">
-        <i className="sidepanel-header-glyph fa fa-plus-circle"
-          onClick={() => joinDialogueOpen.set(true)}></i>
-      </a>
     </h3>
     <ul className="channels">
       {K(chans, R.map(({channel, server, key=shared.dashedKey([channel, server])}) =>
@@ -97,6 +93,15 @@ const Channels = ({ chans }) => // eslint-disable-line no-unused-vars
           {channel}
         </li>))}
     </ul>
+
+    <div className="controls">
+      <a title="Join to a new channel"
+        className="control-link"
+        onClick={() => joinDialogueOpen.set(true)}>
+        <i className="control-link-glyph fa fa-plus"></i>
+        Join a channel
+      </a>
+    </div>
   </div>
 
 const switchChannel = (channel, server) => e => {
