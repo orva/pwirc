@@ -3,6 +3,7 @@ const Atom = require('kefir.atom').default
 const React = require('karet').default  // eslint-disable-line no-unused-vars
 const ReactDOM = require('react-dom')
 const K = require('karet.util').default
+
 const L = require('partial.lenses')
 const R = require('ramda')
 
@@ -18,7 +19,7 @@ const root = Atom({
   },
   openModals: {
     join: false,
-    sidepanel: false,
+    sidepanel: false,  // this is only used in mobile layout
   }
 })
 
@@ -29,7 +30,8 @@ const channels = root.view(
 
 const currentChannel = root.view('currentChannel')
 const joinDialogueOpen = root.view('openModals', 'join')
-const sidebarOpen = root.view('openModals', 'sidepanel')
+const sidepanelOpen = root.view('openModals', 'sidepanel')
+
 
 
 const sock = io.connect()
@@ -111,7 +113,7 @@ const Input = ({ currentChan }) => { // eslint-disable-line no-unused-vars
   return <div className="input-bar">
       <a title="Open sidepanel">
         <i className="input-bar-menu-open-glyph fa fa-bars"
-          onClick={() => sidebarOpen.set(true)}></i>
+          onClick={() => sidepanelOpen.set(true)}></i>
       </a>
       <input className="input input-bar-input"
         value={ state.view('msg') }
@@ -142,11 +144,34 @@ const keypressHandler = (state, currentChan) => e => {
 }
 
 
+const Modals = ({ modalStates, joinOpen }) =>  // eslint-disable-line no-unused-vars
+  <div>
+    <Shadow modalStates={modalStates} />
+    <JoinDialogue isOpen={joinOpen} />
+  </div>
+
+
+const Shadow = ({ modalStates }) =>  // eslint-disable-line no-unused-vars
+  <div
+    className={K(modalStates, s => shadowClasses(s))}
+    onClick={() => closeAllModals(modalStates)} >
+  </div>
+
+const shadowClasses = ({ join, sidepanel }) =>
+  (join || sidepanel) ? 'shadow shadow--open' : 'shadow'
+
+const closeAllModals = modalStates => {
+  const states = modalStates.get()
+  const newStates = R.map(() => false, states)
+  modalStates.modify(s => R.merge(s, newStates))
+}
+
+
 // This is pretty annoying hack: we need to set class to the sidepanel-area DOM
 // node which is parent for the Channels component. This is because we want to
 // have normal DOM flow in desktop and `position: fixed; translate` goodness in
 // mobile. Without using cascading style rules.
-sidebarOpen.onValue(open => {
+sidepanelOpen.onValue(open => {
   const sidepanelArea = document.getElementsByClassName('sidepanel-area').item(0)
   const openClass = 'sidepanel-area--open'
 
@@ -170,5 +195,5 @@ ReactDOM.render(
   document.getElementsByClassName('input-area').item(0))
 
 ReactDOM.render(
-  <JoinDialogue isOpen={joinDialogueOpen} />,
+  <Modals joinOpen={joinDialogueOpen} modalStates={root.view('openModals')} />,
   document.getElementsByClassName('modal-area').item(0))
