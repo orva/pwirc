@@ -17,7 +17,8 @@ const root = Atom({
     channel: ''
   },
   openModals: {
-    join: false
+    join: false,
+    sidepanel: false,
   }
 })
 
@@ -28,6 +29,7 @@ const channels = root.view(
 
 const currentChannel = root.view('currentChannel')
 const joinDialogueOpen = root.view('openModals', 'join')
+const sidebarOpen = root.view('openModals', 'sidepanel')
 
 
 const sock = io.connect()
@@ -84,7 +86,7 @@ const Channels = ({ chans }) => // eslint-disable-line no-unused-vars
       Channels
       <a title="Join to a new channel">
         <i className="sidepanel-header-glyph fa fa-plus-circle"
-           onClick={() => joinDialogueOpen.set(true)}></i>
+          onClick={() => joinDialogueOpen.set(true)}></i>
       </a>
     </h3>
     <ul className="channels">
@@ -139,6 +141,21 @@ const keypressHandler = (state, currentChan) => e => {
   .then(() => msg.set(''))
 }
 
+
+// This is pretty annoying hack: we need to set class to the sidepanel-area DOM
+// node which is parent for the Channels component. This is because we want to
+// have normal DOM flow in desktop and `position: fixed; translate` goodness in
+// mobile. Without using cascading style rules.
+sidebarOpen.onValue(open => {
+  const sidepanelArea = document.getElementsByClassName('sidepanel-area').item(0)
+  const openClass = 'sidepanel-area--open'
+
+  if (open) {
+    sidepanelArea.classList.add(openClass)
+  } else {
+    sidepanelArea.classList.remove(openClass)
+  }
+})
 
 ReactDOM.render(
   <Channels chans={channels} />,

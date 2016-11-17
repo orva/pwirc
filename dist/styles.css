@@ -71,6 +71,10 @@ body {
     box-shadow: 0 0 1em #636363;
   }
 
+  .sidepanel-area--open {
+    transform: translateX(0%);
+  }
+
   .content-area {
     width: 100%;
     height: 100%;
