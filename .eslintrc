@@ -7,12 +7,15 @@
   },
   "extends": [
    "eslint:recommended",
+   "plugin:react/recommended"
   ],
   "rules": {
     "no-console": 0,
     "semi": [2, "never"],
     "quotes": [2, "single"],
-    "no-shadow": 2
+    "no-shadow": 2,
+    "react/prop-types": 0,
+    "react/display-name": 0
   },
   "env": {
     "node": true,

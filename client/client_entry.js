@@ -1,6 +1,6 @@
 const io = require('socket.io-client')
 const Atom = require('kefir.atom').default
-const React = require('karet').default  // eslint-disable-line no-unused-vars
+const React = require('karet').default
 const ReactDOM = require('react-dom')
 const K = require('karet.util').default
 
@@ -8,7 +8,7 @@ const L = require('partial.lenses')
 const R = require('ramda')
 
 const shared = require('./shared')
-const JoinDialogue = require('./join_dialogue') // eslint-disable-line no-unused-vars
+const JoinDialogue = require('./join_dialogue')
 const {
   Sidepanel,
   SidepanelClose,
@@ -52,7 +52,7 @@ sock.on('welcome', () => {
 })
 
 
-const Messages = ({ msgs }) => // eslint-disable-line no-unused-vars
+const Messages = ({ msgs }) =>
   <ul className="messages">
     {K(msgs, R.map(({key, time, user, msg}) =>
       <li key={key} className="messages-msg">
@@ -88,7 +88,7 @@ const leftPad = (paddedLength, padder, str) => {
 }
 
 
-const SidepanelArea = ({ chans }) => // eslint-disable-line no-unused-vars
+const SidepanelArea = ({ chans }) =>
   <Sidepanel>
     <SidepanelClose onClick={() => sidepanelOpen.set(false)} />
 
@@ -107,7 +107,7 @@ const SidepanelArea = ({ chans }) => // eslint-disable-line no-unused-vars
     </SidepanelOptions>
   </Sidepanel>
 
-const Channels = ({ chans }) => // eslint-disable-line no-unused-vars
+const Channels = ({ chans }) =>
   <ul className="channels">
     {K(chans, R.map(({channel, server, key=shared.dashedKey([channel, server])}) =>
       <li key={key} className="channels-chan" onClick={switchChannel(channel, server)}>
@@ -121,7 +121,7 @@ const switchChannel = (channel, server) => e => {
 }
 
 
-const Input = ({ currentChan }) => { // eslint-disable-line no-unused-vars
+const Input = ({ currentChan }) => {
   const state = Atom({
     msg: ''
   })
@@ -160,14 +160,14 @@ const keypressHandler = (state, currentChan) => e => {
 }
 
 
-const Modals = ({ modalStates, joinOpen }) =>  // eslint-disable-line no-unused-vars
+const Modals = ({ modalStates, joinOpen }) =>
   <div>
     <Shadow modalStates={modalStates} />
     <JoinDialogue isOpen={joinOpen} />
   </div>
 
 
-const Shadow = ({ modalStates }) =>  // eslint-disable-line no-unused-vars
+const Shadow = ({ modalStates }) =>
   <div
     className={K(modalStates, s => shadowClasses(s))}
     onClick={() => closeAllModals(modalStates)} >

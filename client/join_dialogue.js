@@ -1,12 +1,12 @@
 const Atom = require('kefir.atom').default
-const React = require('karet').default  // eslint-disable-line no-unused-vars
+const React = require('karet').default
 const K = require('karet.util').default
 const R = require('ramda')
 
 const shared = require('./shared')
 
 
-const JoinDialogue = ({ isOpen }) =>  { // eslint-disable-line no-unused-vars
+const JoinDialogue = ({ isOpen }) =>  {
   const state = Atom(emptyState())
   const serverlist = state.view('servers')
 
@@ -53,7 +53,7 @@ const JoinDialogue = ({ isOpen }) =>  { // eslint-disable-line no-unused-vars
   </div>
 }
 
-const ServerEntry = ({ name, serverUrl, clickHandler, state }) => // eslint-disable-line no-unused-vars
+const ServerEntry = ({ name, serverUrl, clickHandler, state }) =>
   <dd className={K(state, s => serverlistItemClasses(s, name, serverUrl))}
       onClick={clickHandler} >
     {name}<span className="serverlist-item-url">{serverUrl}</span>
