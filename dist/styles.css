@@ -180,25 +180,25 @@ body {
   color: #f0f0f0;
 }
 
-.controls {
+.sidepanel-options {
   height: auto;
   width: 100%;
   padding: 1em 0em;
   border-top: solid 1px #7f7f7f;
 }
 
-.control-link {
+.sidepanel-options-link {
   width: 100%;
   cursor: pointer;
   display: block;
   padding: 0.35em 1.7em;
 }
 
-.control-link:hover {
+.sidepanel-options-link:hover {
   color: #f0f0f0;
 }
 
-.control-link-glyph {
+.sidepanel-options-link-glyph {
   padding-right: 1em;
 }
 

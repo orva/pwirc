@@ -9,6 +9,12 @@ const R = require('ramda')
 
 const shared = require('./shared')
 const JoinDialogue = require('./join_dialogue') // eslint-disable-line no-unused-vars
+const {
+  Sidepanel,
+  SidepanelClose,
+  SidepanelHeader,
+  SidepanelOptions
+} = require('./sidepanel')
 
 const root = Atom({
   messages: [],
@@ -82,31 +88,32 @@ const leftPad = (paddedLength, padder, str) => {
 }
 
 
-const Channels = ({ chans }) => // eslint-disable-line no-unused-vars
-  <div className="sidepanel">
-    <div className="sidepanel-close" onClick={ () => sidepanelOpen.set(false)} >
-      <i className="sidepanel-close-glyph fa fa-times-circle"></i>
-    </div>
+const SidepanelArea = ({ chans }) => // eslint-disable-line no-unused-vars
+  <Sidepanel>
+    <SidepanelClose onClick={() => sidepanelOpen.set(false)} />
 
-    <h4 className="sidepanel-header">
+    <SidepanelHeader>
       Channels
-    </h4>
-    <ul className="channels">
-      {K(chans, R.map(({channel, server, key=shared.dashedKey([channel, server])}) =>
-        <li key={key} className="channels-chan" onClick={switchChannel(channel, server)}>
-          {channel}
-        </li>))}
-    </ul>
+    </SidepanelHeader>
 
-    <div className="controls">
+    <Channels chans={chans} />
+
+    <SidepanelOptions>
       <a title="Join to a new channel"
-        className="control-link"
         onClick={() => joinDialogueOpen.set(true)}>
-        <i className="control-link-glyph fa fa-plus"></i>
+        <i className="sidepanel-options-link-glyph fa fa-plus"></i>
         Join a channel
       </a>
-    </div>
-  </div>
+    </SidepanelOptions>
+  </Sidepanel>
+
+const Channels = ({ chans }) => // eslint-disable-line no-unused-vars
+  <ul className="channels">
+    {K(chans, R.map(({channel, server, key=shared.dashedKey([channel, server])}) =>
+      <li key={key} className="channels-chan" onClick={switchChannel(channel, server)}>
+        {channel}
+      </li>))}
+  </ul>
 
 const switchChannel = (channel, server) => e => {
   e.preventDefault()
@@ -192,7 +199,7 @@ sidepanelOpen.onValue(open => {
 })
 
 ReactDOM.render(
-  <Channels chans={channels} />,
+  <SidepanelArea chans={channels} />,
   document.getElementsByClassName('sidepanel-area').item(0))
 
 ReactDOM.render(
