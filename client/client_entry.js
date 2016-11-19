@@ -13,6 +13,7 @@ const {
   Sidepanel,
   SidepanelClose,
   SidepanelHeader,
+  SidepanelScroll,
   SidepanelOptions
 } = require('./sidepanel')
 
@@ -92,19 +93,21 @@ const SidepanelArea = ({ chans }) =>
   <Sidepanel>
     <SidepanelClose onClick={() => sidepanelOpen.set(false)} />
 
-    <SidepanelHeader>
-      Channels
-    </SidepanelHeader>
+    <SidepanelScroll>
+      <SidepanelHeader>
+        Channels
+      </SidepanelHeader>
 
-    <Channels chans={chans} />
+      <Channels chans={chans} />
 
-    <SidepanelOptions>
-      <a title="Join to a new channel"
-        onClick={() => joinDialogueOpen.set(true)}>
-        <i className="sidepanel-options-link-glyph fa fa-plus"></i>
-        Join a channel
-      </a>
-    </SidepanelOptions>
+      <SidepanelOptions>
+        <a title="Join to a new channel"
+          onClick={() => joinDialogueOpen.set(true)}>
+          <i className="sidepanel-options-link-glyph fa fa-plus"></i>
+          Join a channel
+        </a>
+      </SidepanelOptions>
+    </SidepanelScroll>
   </Sidepanel>
 
 const Channels = ({ chans }) =>

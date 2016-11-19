@@ -11,6 +11,11 @@ const SidepanelClose = ({ onClick }) =>
     <i className="sidepanel-close-glyph fa fa-times-circle"></i>
   </div>
 
+const SidepanelScroll = ({ children }) =>
+  <div className="sidepanel-scrollable">
+   {children}
+  </div>
+
 const SidepanelHeader = ({ children }) =>
   <h4 className="sidepanel-header">
     {children}
@@ -36,5 +41,6 @@ module.exports = {
   Sidepanel,
   SidepanelClose,
   SidepanelHeader,
+  SidepanelScroll,
   SidepanelOptions
 }
