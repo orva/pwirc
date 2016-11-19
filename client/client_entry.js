@@ -89,20 +89,20 @@ const leftPad = (paddedLength, padder, str) => {
 }
 
 
-const SidepanelArea = ({ chans }) =>
+const SidepanelArea = ({ chans, panelOpen, joinOpen }) =>
   <Sidepanel>
-    <SidepanelClose onClick={() => sidepanelOpen.set(false)} />
+    <SidepanelClose onClick={() => panelOpen.set(false)} />
 
     <SidepanelScroll>
       <SidepanelHeader>
         Channels
       </SidepanelHeader>
 
-      <Channels chans={chans} />
+      <Channels chans={chans} panelOpen={panelOpen} />
 
       <SidepanelOptions>
         <a title="Join to a new channel"
-          onClick={() => joinDialogueOpen.set(true)}>
+          onClick={() => joinOpen.set(true)}>
           <i className="sidepanel-options-link-glyph fa fa-plus"></i>
           Join a channel
         </a>
@@ -110,17 +110,28 @@ const SidepanelArea = ({ chans }) =>
     </SidepanelScroll>
   </Sidepanel>
 
-const Channels = ({ chans }) =>
+const Channels = ({ chans, panelOpen }) =>
   <ul className="channels">
-    {K(chans, R.map(({channel, server, key=shared.dashedKey([channel, server])}) =>
-      <li key={key} className="channels-chan" onClick={switchChannel(channel, server)}>
-        {channel}
-      </li>))}
+    {K(chans, R.map(channelEntry(panelOpen)))}
   </ul>
 
-const switchChannel = (channel, server) => e => {
-  e.preventDefault()
-  sock.emit('switch', { channel, server })
+const channelEntry = panelOpen => ({ channel, server }) => {
+  const key = shared.dashedKey([channel, server])
+  const channelType = R.head(channel)
+  const channelName = R.tail(channel)
+
+  return <li className="channels-chan"
+    key={key}
+    onClick={e => {
+      e.preventDefault()
+      sock.emit('switch', { channel, server })
+      panelOpen.set(false)
+    }}>
+    <span className="channels-chan-type">
+      {channelType}
+    </span>
+    {channelName}
+  </li>
 }
 
 
@@ -202,7 +213,10 @@ sidepanelOpen.onValue(open => {
 })
 
 ReactDOM.render(
-  <SidepanelArea chans={channels} />,
+  <SidepanelArea
+    chans={channels}
+    panelOpen={sidepanelOpen}
+    joinOpen={joinDialogueOpen} />,
   document.getElementsByClassName('sidepanel-area').item(0))
 
 ReactDOM.render(
