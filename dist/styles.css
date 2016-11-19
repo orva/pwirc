@@ -257,40 +257,73 @@ body {
   height: 100%;
 }
 
-.modal {
-  position: absolute;
-  z-index: 3;
+@media all and (max-width: 55em) {
+  .modal {
+    position: absolute;
+    z-index: 3;
 
-  width: 25em;
-  height: auto;
-  margin-left: auto;
-  margin-right: auto;
-  left: 0px;
-  right: 0px;
+    width: 100%;
+    height: 100%;
+    left: 0px;
+    right: 0px;
 
-  padding: 2.5em;
+    margin: 0px;
+    padding: 1em;
 
-  /* Magic 16em, seems to position quite nicely */
-  top: calc(100% / 2 - 16em);
+    background-color: white;
+  }
+}
 
-  background-color: white;
-  border: 1px solid #dadada;
-  border-radius: 5px;
-  box-shadow: 0 0 1em #636363;
+@media all and (min-width: 55em) {
+  .modal {
+    position: absolute;
+    z-index: 3;
+
+    width: 25em;
+    height: auto;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0px;
+    right: 0px;
+
+    padding: 2.5em;
+
+    /* Magic 16em, seems to position quite nicely */
+    top: calc(100% / 2 - 16.3em);
+
+    background-color: white;
+    border: 1px solid #dadada;
+    border-radius: 5px;
+    box-shadow: 0 0 1em #636363;
+  }
 }
 
 .modal--hidden {
   display: none;
 }
 
-.serverlist {
-  border: 1px solid #dadada;
-  border-radius: 3px;
-  margin: 0px;
-  height: 12em;
-  overflow-y: auto;
-  padding: 0.5em 0em;
-  margin: 0em 0em 1em 0em;
+@media all and (max-width: 55em) {
+  .serverlist {
+    border: 1px solid #dadada;
+    border-radius: 3px;
+    margin: 0px;
+    height: calc(100% - 14.3em);
+    overflow-y: auto;
+    padding: 0.5em 0em;
+    margin: 0em 0em 1em 0em;
+  }
+}
+
+@media all and (min-width: 55em) {
+  .serverlist {
+    border: 1px solid #dadada;
+    border-radius: 3px;
+    margin: 0px;
+    height: 14em;
+    overflow-y: auto;
+    padding: 0.5em 0em;
+    margin: 0em 0em 1em 0em;
+  }
 }
 
 .serverlist-term {
@@ -336,6 +369,8 @@ body {
   background-color: white;
   border: 1px solid #dadada;
   border-radius: 3px;
+
+  font-size: 0.9em;
 }
 
 .modal-button:hover {
