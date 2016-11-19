@@ -132,6 +132,28 @@ body {
   color: #dadada;
 }
 
+@media all and (max-width: 55em) {
+  .sidepanel-close {
+    cursor: pointer;
+    margin-left: auto;
+    margin-right: 0;
+    width: 4em;
+    height: 4em;
+  }
+
+  .sidepanel-close-glyph {
+    font-size: 1.5em;
+    padding: 1em;
+  }
+}
+
+@media all and (min-width: 55em) {
+  .sidepanel-close {
+    display: none;
+  }
+}
+
+
 .sidepanel-header {
   margin: 0px;
   padding: 1.1em;

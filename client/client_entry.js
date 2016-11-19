@@ -84,6 +84,10 @@ const leftPad = (paddedLength, padder, str) => {
 
 const Channels = ({ chans }) => // eslint-disable-line no-unused-vars
   <div className="sidepanel">
+    <div className="sidepanel-close" onClick={ () => sidepanelOpen.set(false)} >
+      <i className="sidepanel-close-glyph fa fa-times"></i>
+    </div>
+
     <h3 className="sidepanel-header">
       Channels
     </h3>
