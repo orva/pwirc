@@ -152,7 +152,8 @@ body {
 
   .sidepanel-close-glyph {
     font-size: 1.5em;
-    padding: 1em;
+    /* Make glyph to be exactly center of enclosing div. Do not ask */
+    padding: 0.7em 0.9165em;
   }
 }
 
@@ -164,8 +165,9 @@ body {
 
 .sidepanel-header {
   margin: 0px;
-  padding: 0em 2em 1em 2em;
+  padding: 1.35em 2em;
   text-transform: lowercase;
+  border-top: solid 1px #7f7f7f;
 }
 
 .channels-chan {

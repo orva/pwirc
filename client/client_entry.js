@@ -88,9 +88,9 @@ const Channels = ({ chans }) => // eslint-disable-line no-unused-vars
       <i className="sidepanel-close-glyph fa fa-times-circle"></i>
     </div>
 
-    <h3 className="sidepanel-header">
+    <h4 className="sidepanel-header">
       Channels
-    </h3>
+    </h4>
     <ul className="channels">
       {K(chans, R.map(({channel, server, key=shared.dashedKey([channel, server])}) =>
         <li key={key} className="channels-chan" onClick={switchChannel(channel, server)}>
