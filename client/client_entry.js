@@ -106,9 +106,24 @@ const SidepanelArea = ({ chans, panelOpen, joinOpen }) =>
           <i className="sidepanel-options-link-glyph fa fa-plus"></i>
           Join a channel
         </a>
+        <a title="Logout"
+          onClick={logout}>
+          <i className="sidepanel-options-link-glyph fa fa-sign-out"></i>
+          Logout
+        </a>
       </SidepanelOptions>
     </SidepanelScroll>
   </Sidepanel>
+
+const logout = e => {
+  e.preventDefault()
+  fetch('/logout', { method: 'POST', credentials: 'same-origin' })
+    .then(resp => {
+      if (resp.redirected) {
+        window.location.href = resp.url
+      }
+    })
+}
 
 const Channels = ({ chans, panelOpen }) =>
   <ul className="channels">

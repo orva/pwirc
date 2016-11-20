@@ -92,6 +92,11 @@ app.get('/login', (req, res) => res.sendFile(path.join(__dirname, './html/login.
 app.post('/login',
   passport.authenticate('local', { failureRedirect: '/login', successRedirect: '/' }))
 
+app.post('/logout', (req, res) => {
+  req.logout()
+  res.redirect('/login')
+})
+
 app.post('/messages/:server/:to', (req, res) => {
   if (!req.body || typeof req.body !== 'object' || !req.body.msg) {
     res.status(404).end()
