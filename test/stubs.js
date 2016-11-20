@@ -47,6 +47,10 @@ export function initialState() {
 
 export function config() {
   return  {
+    user: {
+      username: 'testuser',
+      password: 'testpassword',
+    },
     connected: [
       {
         serverName: 'freenode',

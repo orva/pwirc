@@ -8,72 +8,80 @@ const stubs = require('./stubs')
 const irc = require('../server/irc_server')
 
 describe('Routes', function() {
-  before(function() {
+  before(function(done) {
     const ircStub = sinon.stub(irc)
     ircStub.connect.returns(stubs.server())
     ircStub.isChannelName.returns(true)
     ircStub.channels.returns(['#first', '#second'])
-
     const serversStub = {}
     serversStub.isExistingChannel = (_, srv, chan) => {
       return srv === 'freenode' && R.contains(chan, ['#first', '#second'])
     }
     serversStub.servers = [stubs.server()]
 
-    this.ircStub = ircStub
-
     const confStub = {}
     confStub.load = sinon.stub().returns(Promise.resolve(stubs.config()))
 
-    this.app = proxyquire('../server/http_handlers', {
+    const app = proxyquire('../server/http_handlers', {
       './irc_server': ircStub,
       './irc_server_state': serversStub,
       './config': confStub
     })
+
+    const user = stubs.config().user
+
+    this.ircStub = ircStub
+    this.agent = request.agent(app)
+    this.agent
+      .post('/login')
+      .type('form')
+      .send({ username: user.username })
+      .send({ password: user.password })
+      .end(done)
   })
 
   afterEach(function() {
     this.ircStub.isChannelName.returns(true)
   })
 
+
   describe('POST /messages/:server/:target', function() {
     it('responds 200 when server, target and body are supplied', function(done) {
-      request(this.app)
-        .post('/messages/freenode/%23first')
+      this.agent.post('/messages/freenode/%23first')
         .send({ msg: 'test message' })
         .expect(200, done)
     })
 
     it('responds 404 when both server and target are not present', function(done) {
-      request(this.app)
+      this.agent
         .post('/messages/freenode')
         .send({ msg: 'test message' })
         .expect(404, done)
     })
 
     it('responds 404 to empty body', function(done) {
-      request(this.app)
+      this.agent
         .post('/messages/freenode/%23first')
         .send('')
         .expect(404, done)
     })
 
     it('responds 404 when body does not contain "msg" field', function(done) {
-      request(this.app)
+      this.agent
         .post('/messages/freenode/%23first')
         .send({ fails: true })
         .expect(404, done)
     })
 
     it('responds 404 when server does not exist', function(done) {
-      request(this.app)
+      this.agent
         .post('/messages/does_not_exist/%23first')
         .send({ msg: 'test message'})
         .expect(404, done)
     })
 
     it('responds 404 when target is channel and does not exist', function(done) {
-      request(this.app)
+      this.agent
         .post('/messages/freenode/%23does_not_exist')
         .send({ msg: 'test message' })
         .expect(404, done)
@@ -82,7 +90,7 @@ describe('Routes', function() {
     it('responds 200 when target is not channel', function(done) {
       this.ircStub.isChannelName.returns(false)
 
-      request(this.app)
+      this.agent
         .post('/messages/freenode/nick')
         .send({ msg: 'test message' })
         .expect(200, done)
@@ -91,13 +99,13 @@ describe('Routes', function() {
 
   describe('POST /channels/:server/:chan', function() {
     it('responds 200 to valid server and chan', function(done) {
-      request(this.app)
+      this.agent
         .post('/channels/freenode/%23third')
         .expect(200, done)
     })
 
     it('responds 404 to not connected server', function(done) {
-      request(this.app)
+      this.agent
         .post('/channels/invalid/%23third')
         .expect(404, done)
     })
@@ -105,13 +113,13 @@ describe('Routes', function() {
     it('responds 404 to invalid channel name', function(done) {
       this.ircStub.isChannelName.returns(false)
 
-      request(this.app)
+      this.agent
         .post('/channels/freenode/not_valid_channel_name')
         .expect(404, done)
     })
 
     it('responds 404 to channel already present', function(done) {
-      request(this.app)
+      this.agent
         .post('/channels/freenode/%23first')
         .expect(404, done)
     })
@@ -119,35 +127,35 @@ describe('Routes', function() {
 
   describe('GET /channels/:server/:chan', function() {
     it('responds 200 to valid server and chan', function(done) {
-      request(this.app)
+      this.agent
         .get('/channels/freenode/%23first')
         .set('Accept', 'text/html')
         .expect(200, done)
     })
 
     it('responds 404 to other than "Accept - application/html"', function(done) {
-      request(this.app)
+      this.agent
         .get('/channels/freenode/%23first')
         .set('Accept', 'application/json')
         .expect(404, done)
     })
 
     it('responds 404 when both server and chan are not present', function(done) {
-      request(this.app)
+      this.agent
         .get('/channels/freenode/')
         .set('Accept', 'text/html')
         .expect(404, done)
     })
 
     it('responds 404 when server does not exist', function(done) {
-      request(this.app)
+      this.agent
         .get('/channels/failnode/%23first')
         .set('Accept', 'text/html')
         .expect(404, done)
     })
 
     it('responds 404 when channel does not exist', function(done) {
-      request(this.app)
+      this.agent
         .get('/channels/failnode/%23third')
         .set('Accept', 'text/html')
         .expect(404, done)
@@ -156,7 +164,7 @@ describe('Routes', function() {
     it('responds 404 to invalid channel name', function(done) {
       this.ircStub.isChannelName.returns(false)
 
-      request(this.app)
+      this.agent
         .post('/channels/freenode/not_valid_channel_name')
         .expect(404, done)
     })
@@ -164,7 +172,7 @@ describe('Routes', function() {
 
   describe('GET /servers', function() {
     it('responds 200 with JSON body containing connected and available servers', function(done) {
-      request(this.app)
+      this.agent
         .get('/servers')
         .expect({
           connected: [{
@@ -194,7 +202,7 @@ describe('Routes', function() {
 
   describe('POST /servers', function() {
     it('responds with 202 when it starts connecting to server', function(done) {
-      request(this.app)
+      this.agent
         .post('/servers')
         .send({
           name: 'quakenet',
@@ -209,7 +217,7 @@ describe('Routes', function() {
     })
 
     it('responds with 400 when "name" is missing', function(done) {
-      request(this.app)
+      this.agent
         .post('/servers')
         .send({
           serverUrl: 'irc.quakenet.org',
@@ -223,7 +231,7 @@ describe('Routes', function() {
     })
 
     it('responds with 400 when "serverUrl" is missing', function(done) {
-      request(this.app)
+      this.agent
         .post('/servers')
         .send({
           name: 'quakenet',
@@ -237,7 +245,7 @@ describe('Routes', function() {
     })
 
     it('responds with 400 when "personality" is missing', function(done) {
-      request(this.app)
+      this.agent
         .post('/servers')
         .send({
           name: 'quakenet',
@@ -248,7 +256,7 @@ describe('Routes', function() {
     })
 
     it('responds with 400 when "personality.nick" is missing', function(done) {
-      request(this.app)
+      this.agent
         .post('/servers')
         .send({
           name: 'quakenet',
@@ -262,7 +270,7 @@ describe('Routes', function() {
     })
 
     it('responds with 400 when "personality.realName" is missing', function(done) {
-      request(this.app)
+      this.agent
         .post('/servers')
         .send({
           name: 'quakenet',
@@ -276,7 +284,7 @@ describe('Routes', function() {
     })
 
     it('responds with 400 when "channels" is missing', function(done) {
-      request(this.app)
+      this.agent
         .post('/servers')
         .send({
           name: 'quakenet',

@@ -96,7 +96,7 @@ const refreshServersWhenOpened = serverlist => isOpen => {
     return
   }
 
-  fetch('/servers')
+  fetch('/servers', { credentials: 'same-origin' })
     .then(res => res.json())
     .then(res => serverlist.set(res))
 }
@@ -182,7 +182,7 @@ const joinChannel = (state, isOpen) => {
   const channel = encodeURIComponent(data.channel)
   const url = `/channels/${server}/${channel}`
 
-  fetch(url, { method: 'POST' })
+  fetch(url, { method: 'POST', credentials: 'same-origin' })
     .then(() => {
       state.set(emptyState())
       isOpen.set(false)
@@ -204,6 +204,7 @@ const connectServerAndJoinChannel = (state, isOpen) => {
 
   fetch('/servers', {
     method: 'POST',
+    credentials: 'same-origin',
     body: JSON.stringify(payload),
     headers: {
       'Content-Type': 'application/json'

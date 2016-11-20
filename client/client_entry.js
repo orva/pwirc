@@ -167,6 +167,7 @@ const keypressHandler = (state, currentChan) => e => {
 
   fetch(url, {
     method: 'POST',
+    credentials: 'same-origin',
     body: JSON.stringify(payload),
     headers: { 'Content-Type': 'application/json' }
   })

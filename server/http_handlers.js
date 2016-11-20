@@ -2,6 +2,12 @@ const path = require('path')
 const http = require('http')
 const express = require('express')
 const bodyParser = require('body-parser')
+
+const session = require('express-session')
+const FileStore = require('session-file-store')(session)
+const passport = require('passport')
+const LocalStrategy = require('passport-local').Strategy
+
 const SocketIO = require('socket.io')
 const R = require('ramda')
 const Promise = require('bluebird')
@@ -24,10 +30,67 @@ servers.events.on('server-added', srv => {
   io.emit('channels-updated', serverState.allChannels(servers))
 })
 
+passport.use(new LocalStrategy((username, password, done) => {
+  config.load(configFile)
+    .then(conf => {
+      if (!conf || !conf.user) {
+        // TODO config not found error
+        done(null, false)
+        return
+      }
+
+      const usr = conf.user.username
+      const pwd = conf.user.password
+
+      if (!usr || !username || username !== usr ||
+          !pwd || !password || password !== pwd) {
+        done(null, false)
+        return
+      }
+
+      done(null, conf.user)
+    })
+}))
+
+passport.serializeUser((user, done) => done(null, user.username))
+passport.deserializeUser((username, done) =>
+  config.load(configFile)
+    .then(conf => done(null, conf.user)))
+
+const ensureAuthenticated = (req, res, next) => {
+  if (req.path === '/login' || req.path === '/login.html') {
+    next()
+    return
+  }
+
+  if (!req.user) {
+    res.redirect('/login')
+  } else {
+    next()
+  }
+}
 
 app.disable('x-powered-by')
 app.use(express.static(path.join(__dirname, '../dist')))
 app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(session({
+  store: new FileStore({ path: './data/sessions' }),
+  secret: 'banana split',
+  resave: false,
+  saveUninitialized: false,
+}))
+app.use(passport.initialize())
+app.use(passport.session())
+app.use(ensureAuthenticated)
+
+app.get('/',
+  (req, res) => res.sendFile(path.join(__dirname, './html/index.html')))
+
+app.get('/login', (req, res) => res.sendFile(path.join(__dirname, './html/login.html')))
+
+app.post('/login',
+  passport.authenticate('local', { failureRedirect: '/login', successRedirect: '/' }))
 
 app.post('/messages/:server/:to', (req, res) => {
   if (!req.body || typeof req.body !== 'object' || !req.body.msg) {
@@ -72,7 +135,7 @@ app.get('/channels/:server/:chan', (req, res) => {
     return
   }
 
-  res.sendFile(path.join(__dirname, '../dist/index.html'))
+  res.sendFile(path.join(__dirname, './html/index.html'))
 })
 
 app.get('/servers', (req, res) => {
@@ -111,24 +174,24 @@ app.post('/servers', ({ body: { name, serverUrl, personality, channels } }, res)
 
 
 io.on('connection', sock => {
-  const session = channel.create(servers)
+  const currentChan = channel.create(servers)
 
   sock.on('disconnect', () => {
-    channel.close(session)
+    channel.close(currentChan)
   })
 
   sock.on('switch', chan => {
-    const state = channel.switchChannel(session, chan)
+    const state = channel.switchChannel(currentChan, chan)
     sock.emit('channel-switched', state)
   })
 
-  session.events.on('message', msg => {
+  currentChan.events.on('message', msg => {
     sock.emit('message', msg)
   })
 
   sock.emit('channels-updated', serverState.allChannels(servers))
 
-  const initialState = channel.initialState(session)
+  const initialState = channel.initialState(currentChan)
   if (initialStateIsStable(initialState)) {
     sock.emit('channel-switched', initialState)
   }
