@@ -117,11 +117,14 @@ const SidepanelArea = ({ chans, panelOpen, joinOpen }) =>
 
 const logout = e => {
   e.preventDefault()
-  fetch('/logout', { method: 'POST', credentials: 'same-origin' })
+  fetch('/logout', { method: 'POST', credentials: 'same-origin', redirect: 'manual' })
     .then(resp => {
-      if (resp.redirected) {
-        window.location.href = resp.url
+      if (resp.type !== 'opaqueredirect') {
+        console.error('Logout response should have been redirect! Response:', resp)
+        return
       }
+
+      window.location.href = resp.url
     })
 }
 
