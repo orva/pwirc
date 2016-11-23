@@ -12,6 +12,7 @@ const connect = (name, url, nick, opts) => {
     realName: opts.realName || '',
     serverUrl: url,
     allMessages: [],
+    privateMessages: [],
     irc: new irc.Client(url, nick, opts),
     events: new EventEmitter()
   }
@@ -66,8 +67,14 @@ const setupServerEventListeners = server => {
   server.irc.addListener('selfMessage', (to, msg) => {
     const nick = server.irc.nick
     const message = createMessageObject(server.serverUrl, nick, to, msg)
-    server.allMessages.push(message)
-    server.events.emit('message', message)
+
+    if (isChannelName(server, to)) {
+      server.allMessages.push(message)
+      server.events.emit('message', message)
+    } else {
+      server.privateMessages.push(message)
+      server.events.emit('private-message', message)
+    }
   })
 
   server.irc.addListener('join', (chan, nick) => {
@@ -80,6 +87,13 @@ const setupServerEventListeners = server => {
     if (oldNick === server.nick) {
       server.nick = newNick
     }
+  })
+
+  server.irc.addListener('pm', (from, msg) => {
+    const nick = server.irc.nick
+    const message = createMessageObject(server.serverUrl, from, nick, msg)
+
+    server.events.emit('private-message', message)
   })
 }
 

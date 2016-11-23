@@ -152,16 +152,17 @@ describe('IrcServer', function() {
   })
 
   describe('events', function() {
-    describe('message', function() {
-      function shouldBeMessageObject(obj) {
-        should.exist(obj.time)
-        should.exist(obj.key)
-        should.exist(obj.server)
-        should.exist(obj.user)
-        should.exist(obj.to)
-        should.exist(obj.msg)
-      }
+    function shouldBeMessageObject(obj) {
+      should.exist(obj.time, 'msg.time')
+      should.exist(obj.key, 'msg.key')
+      should.exist(obj.server, 'msg.server')
+      should.exist(obj.user, 'msg.user')
+      should.exist(obj.to, 'msg.to')
+      should.exist(obj.msg, 'msg.msg')
+    }
 
+
+    describe('message', function() {
       it('is emitted when channel receives messages from other users', function(done) {
         this.server.events.on('message', function(msg) {
           should.exist(msg)
@@ -188,7 +189,7 @@ describe('IrcServer', function() {
         this.server.irc.emit('message', 'test-user', '#testing-1', 'hello world!')
       })
 
-      it('is payload can be found with messages-call', function(done) {
+      it('payload can be found with messages-call', function(done) {
         const server = this.server
         const irc = this.irc
         this.server.events.on('message', function(msg) {
@@ -202,9 +203,25 @@ describe('IrcServer', function() {
     })
 
     describe('private-message', function() {
-      it('is emitted when someone messages user directly')
-      it('is emitted when user messages someone directly')
-      it('contains expected fields in payload')
+      it('is emitted when someone messages user directly', function(done) {
+        this.server.events.on('private-message', function(msg) {
+          shouldBeMessageObject(msg)
+          done()
+        })
+
+        this.server.irc.emit('pm', 'someone', 'message from someone')
+      })
+
+      it('is emitted when user messages someone directly', function(done) {
+        this.server.events.on('private-message', function(msg) {
+          shouldBeMessageObject(msg)
+          done()
+        })
+
+        this.server.irc.emit('selfMessage', 'someone', 'our message to someone')
+      })
+
+      it('payload can be found with privateMessages-call')
     })
 
     describe('channel-joined', function() {
