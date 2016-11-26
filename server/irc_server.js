@@ -59,14 +59,18 @@ const setupServerEventListeners = server => {
   })
 
   server.irc.addListener('message', (from, to, msg) => {
-    const message = createMessageObject(server.serverUrl, from, to, msg)
+    if (from === server.irc.nick) {
+      return
+    }
+
+    const message = createMessageObject(server.serverUrl, from, false, to, msg)
     server.allMessages.push(message)
     server.events.emit('message', message)
   })
 
   server.irc.addListener('selfMessage', (to, msg) => {
     const nick = server.irc.nick
-    const message = createMessageObject(server.serverUrl, nick, to, msg)
+    const message = createMessageObject(server.serverUrl, nick, true, to, msg)
 
     if (isChannelName(server, to)) {
       server.allMessages.push(message)
@@ -91,19 +95,20 @@ const setupServerEventListeners = server => {
 
   server.irc.addListener('pm', (from, msg) => {
     const nick = server.irc.nick
-    const message = createMessageObject(server.serverUrl, from, nick, msg)
+    const message = createMessageObject(server.serverUrl, from, false, nick, msg)
 
     server.events.emit('private-message', message)
   })
 }
 
-const createMessageObject = (serverUrl, from, to, msg) => ({
+const createMessageObject = (serverUrl, from, selfMessage, to, msg) => ({
   time: new Date(),
   key: uuid.v4(),
   server: serverUrl,
   user: from,
-  to: to,
-  msg: msg
+  selfMessage,
+  to,
+  msg
 })
 
 module.exports = {

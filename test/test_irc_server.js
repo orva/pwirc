@@ -157,6 +157,7 @@ describe('IrcServer', function() {
       should.exist(obj.key, 'msg.key')
       should.exist(obj.server, 'msg.server')
       should.exist(obj.user, 'msg.user')
+      should.exist(obj.selfMessage, 'msg.selfMessage')
       should.exist(obj.to, 'msg.to')
       should.exist(obj.msg, 'msg.msg')
     }
@@ -170,6 +171,7 @@ describe('IrcServer', function() {
           should.equal(msg.user, 'other-user')
           should.equal(msg.to, '#testing-1')
           should.equal(msg.msg, 'hello world!')
+          should(msg.selfMessage).be.false()
           done()
         })
 
@@ -183,11 +185,23 @@ describe('IrcServer', function() {
           should.equal(msg.user, 'test-user')
           should.equal(msg.to, '#testing-1')
           should.equal(msg.msg, 'hello world!')
+          should(msg.selfMessage).be.true()
           done()
         })
 
-        this.server.irc.emit('message', 'test-user', '#testing-1', 'hello world!')
+        this.server.irc.emit('selfMessage', '#testing-1', 'hello world!')
       })
+
+     it('is not emitted from server.irc `message` emits from user nickname', function(done) {
+       const spy = sinon.spy()
+       this.server.events.on('message', spy)
+       this.server.irc.emit('message', 'test-user', '#testing-3', 'other-user')
+
+       setTimeout(() => {
+         should(spy.called).be.false()
+         done()
+       }, 25)
+     })
 
       it('payload can be found with messages-call', function(done) {
         const server = this.server
@@ -198,7 +212,7 @@ describe('IrcServer', function() {
           done()
         })
 
-        this.server.irc.emit('message', 'test-user', '#testing-1', 'hello world!')
+        this.server.irc.emit('selfMessage', '#testing-1', 'hello world!')
       })
     })
 
@@ -206,6 +220,7 @@ describe('IrcServer', function() {
       it('is emitted when someone messages user directly', function(done) {
         this.server.events.on('private-message', function(msg) {
           shouldBeMessageObject(msg)
+          should(msg.selfMessage).be.false()
           done()
         })
 
@@ -215,6 +230,7 @@ describe('IrcServer', function() {
       it('is emitted when user messages someone directly', function(done) {
         this.server.events.on('private-message', function(msg) {
           shouldBeMessageObject(msg)
+          should(msg.selfMessage).be.true()
           done()
         })
 
