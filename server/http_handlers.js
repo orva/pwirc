@@ -16,6 +16,7 @@ const irc = require('./irc_server')
 const serverState = require('./irc_server_state')
 const channel = require('./channel_filter')
 const config = require('./config')
+const auth = require('./auth')
 
 const configFile = path.join(__dirname, '../data/configuration.json')
 
@@ -30,32 +31,9 @@ servers.events.on('server-added', srv => {
   io.emit('channels-updated', serverState.allChannels(servers))
 })
 
-passport.use(new LocalStrategy((username, password, done) => {
-  config.load(configFile)
-    .then(conf => {
-      if (!conf || !conf.user) {
-        // TODO config not found error
-        done(null, false)
-        return
-      }
-
-      const usr = conf.user.username
-      const pwd = conf.user.password
-
-      if (!usr || !username || username !== usr ||
-          !pwd || !password || password !== pwd) {
-        done(null, false)
-        return
-      }
-
-      done(null, conf.user)
-    })
-}))
-
-passport.serializeUser((user, done) => done(null, user.username))
-passport.deserializeUser((username, done) =>
-  config.load(configFile)
-    .then(conf => done(null, conf.user)))
+passport.use(new LocalStrategy(auth.strategyHandler(configFile)))
+passport.serializeUser(auth.serializeUser)
+passport.deserializeUser(auth.deserializeUser(configFile))
 
 const ensureAuthenticated = (req, res, next) => {
   if (req.path === '/login' || req.path === '/login.html') {

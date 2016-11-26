@@ -25,7 +25,8 @@ describe('Routes', function() {
     const app = proxyquire('../server/http_handlers', {
       './irc_server': ircStub,
       './irc_server_state': serversStub,
-      './config': confStub
+      './config': confStub,
+      './auth': proxyquire('../server/auth', { './config': confStub })
     })
 
     const user = stubs.config().user
