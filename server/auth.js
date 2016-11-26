@@ -1,4 +1,5 @@
 const Promise = require('bluebird')
+const R = require('ramda')
 const scrypt = require('scrypt')
 const config = require('./config')
 
@@ -26,7 +27,7 @@ const strategyHandler = configfile => (username, password, done) =>
 
 const serializeUser = (user, done) => done(null, user.username)
 const deserializeUser = configfile => (username, done) =>
-  config.load(configfile).then(conf => done(null, conf.user))
+  config.load(configfile).then(conf => done(null, R.omit('password', conf.user)))
 
 const isPasswordValid = (storedPassword, password) => {
   const buf = Buffer.from(storedPassword, 'hex')

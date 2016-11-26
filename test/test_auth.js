@@ -1,3 +1,4 @@
+const R = require('ramda')
 const path = require('path')
 const should = require('should')
 const sinon = require('sinon')
@@ -75,12 +76,12 @@ describe('Auth', () => {
   describe('deserializeUser', () => {
     it('fetches the (only) user from the configfile', () => {
       const spy = sinon.spy()
-      const user = conf.user
+      const expected = R.omit('password', conf.user)
       const deserializer = auth.deserializeUser(filename)
       deserializer(undefined, spy)
 
       return Promise.delay(25)
-        .then(() => should(spy.calledWith(null, user)).be.true())
+        .then(() => should(spy.calledWith(null, expected)).be.true())
     })
   })
 })
