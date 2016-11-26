@@ -32,8 +32,10 @@ const join = (server, channel, cb) => {
 const say = (target, msg, server) =>
   server.irc.say(target, msg)
 
-const messages = (channel, server) =>
-  R.filter(R.propEq('to', channel), server.allMessages)
+const messages = (to, server) =>
+  isChannelName(server, to)
+    ? R.filter(R.propEq('to', to), server.allMessages)
+    : R.filter(msg => (msg.to === to || msg.user === to), server.privateMessages)
 
 const channels = server => {
   if (!server) {
@@ -97,6 +99,7 @@ const setupServerEventListeners = server => {
     const nick = server.irc.nick
     const message = createMessageObject(server.serverUrl, from, false, nick, msg)
 
+    server.privateMessages.push(message)
     server.events.emit('private-message', message)
   })
 }

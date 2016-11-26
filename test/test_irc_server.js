@@ -192,18 +192,18 @@ describe('IrcServer', function() {
         this.server.irc.emit('selfMessage', '#testing-1', 'hello world!')
       })
 
-     it('is not emitted from server.irc `message` emits from user nickname', function(done) {
-       const spy = sinon.spy()
-       this.server.events.on('message', spy)
-       this.server.irc.emit('message', 'test-user', '#testing-3', 'other-user')
+      it('is not emitted from server.irc `message` emits from user nickname', function(done) {
+        const spy = sinon.spy()
+        this.server.events.on('message', spy)
+        this.server.irc.emit('message', 'test-user', '#testing-3', 'other-user')
 
-       setTimeout(() => {
-         should(spy.called).be.false()
-         done()
-       }, 25)
-     })
+        setTimeout(() => {
+          should(spy.called).be.false()
+          done()
+        }, 25)
+      })
 
-      it('payload can be found with messages-call', function(done) {
+      it('messages from user can be found with `server.messages`', function(done) {
         const server = this.server
         const irc = this.irc
         this.server.events.on('message', function(msg) {
@@ -213,6 +213,18 @@ describe('IrcServer', function() {
         })
 
         this.server.irc.emit('selfMessage', '#testing-1', 'hello world!')
+      })
+
+      it('messages from others can be found with `server.messages`', function(done) {
+        const server = this.server
+        const irc = this.irc
+        this.server.events.on('message', function(msg) {
+          const messageExists = R.contains(msg, irc.messages('#testing-1', server))
+          should(messageExists).be.true()
+          done()
+        })
+
+        this.server.irc.emit('message', 'other-user', '#testing-1', 'hello world!')
       })
     })
 
@@ -237,7 +249,29 @@ describe('IrcServer', function() {
         this.server.irc.emit('selfMessage', 'someone', 'our message to someone')
       })
 
-      it('payload can be found with privateMessages-call')
+      it('private messages to user can be found with `server.messages`', function(done) {
+        const server = this.server
+        const irc = this.irc
+        this.server.events.on('private-message', function(msg) {
+          const messageExists = R.contains(msg, irc.messages('someone', server))
+          should(messageExists).be.true()
+          done()
+        })
+
+        this.server.irc.emit('pm', 'someone', 'hello world!')
+      })
+
+      it('private messages from user can be found with `server.messages`', function(done) {
+        const server = this.server
+        const irc = this.irc
+        this.server.events.on('private-message', function(msg) {
+          const messageExists = R.contains(msg, irc.messages('someone', server))
+          should(messageExists).be.true()
+          done()
+        })
+
+        this.server.irc.emit('selfMessage', 'someone', 'our message to someone')
+      })
     })
 
     describe('channel-joined', function() {
