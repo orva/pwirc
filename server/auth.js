@@ -1,3 +1,5 @@
+const Promise = require('bluebird')
+const scrypt = require('scrypt')
 const config = require('./config')
 
 const strategyHandler = configfile => (username, password, done) =>
@@ -13,18 +15,24 @@ const strategyHandler = configfile => (username, password, done) =>
       const pwd = conf.user.password
 
       if (!usr || !username || username !== usr ||
-          !pwd || !password || password !== pwd) {
+          !pwd || !password) {
         done(null, false)
         return
       }
 
-      done(null, conf.user)
+      return isPasswordValid(conf.user.password, password)
+        .then(valid => valid ? done(null, conf.user) : done(null, false))
     })
 
 const serializeUser = (user, done) => done(null, user.username)
 const deserializeUser = configfile => (username, done) =>
   config.load(configfile).then(conf => done(null, conf.user))
 
+const isPasswordValid = (storedPassword, password) => {
+  const buf = Buffer.from(storedPassword, 'hex')
+  return Promise.resolve(scrypt.verifyKdf(buf, password))
+    .catch(() => false)
+}
 
 module.exports = {
   strategyHandler,

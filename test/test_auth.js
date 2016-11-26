@@ -11,9 +11,11 @@ const auth = require('../server/auth')
 
 describe('Auth', () => {
   const filename = path.join(__dirname, '.test_auth_config.json')
+  const pwd = 'testpassword'
+  const conf = stubs.config()
 
   before(() => {
-    const jsonStr = JSON.stringify(stubs.config())
+    const jsonStr = JSON.stringify(conf)
     return fs.writeFileAsync(filename, jsonStr, 'utf8')
   })
 
@@ -29,24 +31,23 @@ describe('Auth', () => {
     }
 
     it('calls done with user when password matches', () => {
-      const user = stubs.config().user
-      const spy = callWithSpy(user.username, user.password)
+      const user = conf.user
+      const spy = callWithSpy(user.username, pwd)
 
-      return Promise.delay(25)
+      return Promise.delay(75)
         .then(() => should(spy.calledWith(null, user)).be.true())
     })
 
     it('calls done with false when password does not match', () => {
-      const user = stubs.config().user
+      const user = conf.user
       const spy = callWithSpy(user.username, 'invalid password')
 
-      return Promise.delay(25)
+      return Promise.delay(75)
         .then(() => should(spy.calledWith(null, false)).be.true())
     })
 
     it('calls done with false when username does not match', () => {
-      const user = stubs.config().user
-      const spy = callWithSpy('invaliduser', user.password)
+      const spy = callWithSpy('invaliduser', pwd)
 
       return Promise.delay(25)
         .then(() => should(spy.calledWith(null, false)).be.true())
@@ -74,7 +75,7 @@ describe('Auth', () => {
   describe('deserializeUser', () => {
     it('fetches the (only) user from the configfile', () => {
       const spy = sinon.spy()
-      const user = stubs.config().user
+      const user = conf.user
       const deserializer = auth.deserializeUser(filename)
       deserializer(undefined, spy)
 

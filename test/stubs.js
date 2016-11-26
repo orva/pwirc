@@ -49,7 +49,8 @@ export function config() {
   return  {
     user: {
       username: 'testuser',
-      password: 'testpassword',
+      // scrypted 'testpassword'
+      password: '736372797074000e0000000800000001d487ca5342ddcc0fb99a793db26806ca78b8cc6f4c8b2f28601bd4e9bc66e3e139338aafc968fe2c16ac6e6ca35e7ff1eb82d1deef4d852a4bda1788cd60210264289d3224f6cd7b36e0d15a983ce1ab',
     },
     connected: [
       {

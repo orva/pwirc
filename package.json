@@ -49,6 +49,7 @@
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
     "ramda": "^0.22.1",
+    "scrypt": "^6.0.3",
     "session-file-store": "^1.0.0",
     "socket.io": "^1.5.1",
     "uuid": "^2.0.3"

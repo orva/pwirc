@@ -37,7 +37,7 @@ describe('Routes', function() {
       .post('/login')
       .type('form')
       .send({ username: user.username })
-      .send({ password: user.password })
+      .send({ password: 'testpassword' })
       .end(done)
   })
 
