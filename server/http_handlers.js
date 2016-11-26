@@ -190,9 +190,8 @@ io.on('connection', sock => {
     sock.emit('channel-switched', state)
   })
 
-  currentChan.events.on('message', msg => {
-    sock.emit('message', msg)
-  })
+  forwardEventToClient(currentChan, sock, 'message')
+  forwardEventToClient(currentChan, sock, 'private-message')
 
   sock.emit('channels-updated', serverState.allChannels(servers))
 
@@ -203,6 +202,9 @@ io.on('connection', sock => {
 
   sock.emit('welcome')
 })
+
+const forwardEventToClient = (currentChan, sock, type) =>
+  currentChan.events.on(type, payload => sock.emit(type, payload))
 
 const initialStateIsStable = state =>
   (!R.isEmpty(state) && exists(state.server) && exists(state.channel))
