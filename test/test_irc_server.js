@@ -93,6 +93,19 @@ describe('IrcServer', function() {
         .then(() => should.deepEqual(server.names, expected))
     })
 
+    it('is updated when `server.irc` emits `part` for someone else', function() {
+      this.client.emit('names', nastyChannel, nastyUsers)
+      this.client.emit('part', nastyChannel, 'minime', 'I was bored')
+
+      const expected = {
+        [nastyChannel]: R.omit('minime', nastyUsers)
+      }
+
+      const server = this.server
+      return Promise.delay(25)
+        .then(() => should.deepEqual(server.names, expected))
+    })
+
     it('is updated when `server.irc` emits `part` for the user', function() {
       const nick = this.server.nick
       this.client.emit('names', lovelyChannel, lovelyUsers)
@@ -338,15 +351,13 @@ describe('IrcServer', function() {
         this.server.irc.emit('join', '#testing-3', 'test-user')
       })
 
-      it('is not emitted someone else joins a channel', function(done) {
+      it('is not emitted someone else joins a channel', function() {
         const spy = sinon.spy()
         this.server.events.on('channel-joined', spy)
         this.server.irc.emit('join', '#testing-3', 'other-user')
 
-        setTimeout(() => {
-          should(spy.called).be.false()
-          done()
-        }, 25)
+        return Promise.delay(35)
+          .then(() => should(spy.called).be.false())
       })
 
       it('contains expected fields in payload', function(done) {
@@ -449,9 +460,25 @@ describe('IrcServer', function() {
     })
 
     describe('event-part', function() {
-      it('is emitted when someone else parts a channel')
-      it('is not emitted when user parts a channel')
-      it('contains expected fields in payload')
+      it('is emitted when someone else parts a channel', function(done) {
+        this.server.events.on('event-part', (ev) => {
+          const expected = { channel: '#another-channel', nick: 'other-user', reason: 'I was bored' }
+          should.deepEqual(ev, expected)
+          done()
+        })
+
+        this.client.emit('part', '#another-channel', 'other-user', 'I was bored')
+      })
+
+      it('is not emitted when user parts a channel', function() {
+        const spy = sinon.spy()
+        const nick = this.server.nick
+        this.server.events.on('event-part', spy)
+        this.client.emit('part', '#another-channel', nick, 'It was too time consuming')
+
+        return Promise.delay(35)
+          .then(() => should(spy.called).be.false())
+      })
     })
 
     describe('event-action', function() {

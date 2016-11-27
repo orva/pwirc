@@ -172,6 +172,7 @@ io.on('connection', sock => {
   forwardEventToClient(currentChan, sock, 'private-message')
   forwardEventToClient(currentChan, sock, 'names')
   forwardEventToClient(currentChan, sock, 'event-join')
+  forwardEventToClient(currentChan, sock, 'event-part')
 
   sock.emit('channels-updated', serverState.allChannels(servers))
 

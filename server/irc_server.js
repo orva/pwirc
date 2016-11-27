@@ -102,6 +102,14 @@ const setupServerEventListeners = server => {
     if (nick === server.irc.nick) {
       server.names = R.omit(channel, server.names)
       server.events.emit('channel-parted', channel)
+    } else {
+      const existingNameObj = server.names[channel] || {}
+      const updatedNameObj = R.omit(nick, existingNameObj)
+      const names = { [channel]: updatedNameObj }
+      server.names = R.merge(server.names, names)
+
+      server.events.emit('event-part', { channel, nick, reason })
+      server.events.emit('names', names)
     }
   })
 
