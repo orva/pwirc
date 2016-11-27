@@ -92,6 +92,21 @@ describe('IrcServer', function() {
       return Promise.delay(25)
         .then(() => should.deepEqual(server.names, expected))
     })
+
+    it('is updated when `server.irc` emits `part` for the user', function() {
+      const nick = this.server.nick
+      this.client.emit('names', lovelyChannel, lovelyUsers)
+      this.client.emit('names', nastyChannel, nastyUsers)
+      this.client.emit('part', nastyChannel, nick, 'It was too time consuming')
+
+      const expected = {
+        [lovelyChannel]: lovelyUsers
+      }
+
+      const server = this.server
+      return Promise.delay(25)
+        .then(() => should.deepEqual(server.names, expected))
+    })
   })
 
   describe('connect', function() {
@@ -345,10 +360,25 @@ describe('IrcServer', function() {
       })
     })
 
-    describe('channel-left', function() {
-      it('is emitted when user leaves a channel')
-      it('is not emitted someone else leaves a channel')
-      it('contains expected fields in payload')
+    describe('channel-parted', function() {
+      it('is emitted when user leaves a channel', function(done) {
+        const nick = this.server.nick
+        this.server.events.on('channel-parted', chan => {
+          should.equal(chan, '#testing-2')
+          done()
+        })
+
+        this.server.irc.emit('part', '#testing-2', nick, 'It was too time consuming')
+      })
+
+      it('is not emitted someone else leaves a channel', function() {
+        const spy = sinon.spy()
+        this.server.events.on('channel-parted', spy)
+        this.server.irc.emit('part', '#testing-2', 'other-user', 'I was bored')
+
+        return Promise.delay(35)
+          .then(() => should(spy.called).be.false())
+      })
     })
 
     describe('names', function() {

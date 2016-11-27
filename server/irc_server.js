@@ -98,6 +98,13 @@ const setupServerEventListeners = server => {
     }
   })
 
+  server.irc.addListener('part', (channel, nick, reason) => {
+    if (nick === server.irc.nick) {
+      server.names = R.omit(channel, server.names)
+      server.events.emit('channel-parted', channel)
+    }
+  })
+
   server.irc.addListener('nick', (oldNick, newNick) => {
     if (oldNick === server.nick) {
       server.nick = newNick

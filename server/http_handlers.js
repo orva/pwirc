@@ -213,6 +213,10 @@ const serverBroadcasts = (sockIO, server) => {
   server.events.on('channel-joined', () => {
     sockIO.emit('channels-updated', serverState.allChannels(servers))
   })
+
+  server.events.on('channel-parted', () => {
+    sockIO.emit('channels-updated', serverState.allChannels(servers))
+  })
 }
 
 
