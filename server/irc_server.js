@@ -96,8 +96,10 @@ const setupServerEventListeners = server => {
     }
   })
 
-  server.irc.addListener('names', (channel, names) => {
-    server.names = R.merge(server.names, { [channel]: names })
+  server.irc.addListener('names', (channel, nameobject) => {
+    const names = { [channel]: nameobject }
+    server.names = R.merge(server.names, names)
+    server.events.emit('names', names)
   })
 
   server.irc.addListener('pm', (from, msg) => {

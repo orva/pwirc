@@ -338,6 +338,37 @@ describe('IrcServer', function() {
       it('contains expected fields in payload')
     })
 
+    describe('names', function() {
+      const lovelyChannel = '#lovely-channel'
+      const lovelyUsers = {
+        'pooh': '@',
+        'moomin': '+',
+      }
+      const nastyChannel = '#nasty-channel'
+      const nastyUsers = {
+        'doctorevil': '@',
+        'minime': '',
+      }
+
+
+      it('is emitted when `server.irc` emits `names`', function() {
+        const spy = sinon.spy()
+        this.server.events.on('names', spy)
+
+        this.client.emit('names', lovelyChannel, lovelyUsers)
+        this.client.emit('names', nastyChannel, nastyUsers)
+
+        return Promise.delay(25)
+          .then(() => {
+            should(spy.calledWith({ [lovelyChannel]: lovelyUsers })).be.true()
+            should(spy.calledWith({ [nastyChannel]: nastyUsers })).be.true()
+          })
+      })
+
+      it('is emitted when `server.events` emits `event-join`')
+      it('is emitted when `server.events` emits `event-part`')
+    })
+
     describe('event-join', function() {
       it('is emitted when someone else joins a channel')
       it('is not emitted when user joins a channel')
