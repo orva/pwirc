@@ -13,6 +13,7 @@ const connect = (name, url, nick, opts) => {
     serverUrl: url,
     allMessages: [],
     privateMessages: [],
+    names: {},
     irc: new irc.Client(url, nick, opts),
     events: new EventEmitter()
   }
@@ -93,6 +94,10 @@ const setupServerEventListeners = server => {
     if (oldNick === server.nick) {
       server.nick = newNick
     }
+  })
+
+  server.irc.addListener('names', (channel, names) => {
+    server.names = R.merge(server.names, { [channel]: names })
   })
 
   server.irc.addListener('pm', (from, msg) => {

@@ -37,7 +37,7 @@ describe('IrcServer', function() {
       should.equal(this.server.nick, 'test-user')
     })
 
-    it('is updated from client `nick` events', function() {
+    it('is updated when `server.irc` emits `nick` targeting user', function() {
       const srv = this.server
       this.client.emit('nick', 'test-user', 'second-test-user', ['#testing-1', '#testing-2'])
 
@@ -45,12 +45,39 @@ describe('IrcServer', function() {
         .then(() => should.equal(srv.nick, 'second-test-user'))
     })
 
-    it('other user changing nick do not affect `server.nick`', function() {
+    it('is NOT updated when `server.irc` emits `nick` targeting other users', function() {
       const srv = this.server
       this.client.emit('nick', 'other-user', 'second-test-user', ['#testing-1', '#testing-2'])
 
       return Promise.delay(20)
         .then(() => should.equal(srv.nick, 'test-user'))
+    })
+  })
+
+  describe('names', function() {
+    it('is updated when `server.irc` emits `names`', function() {
+      const lovelyChannel = '#lovely-channel'
+      const lovelyUsers = {
+        'pooh': '@',
+        'moomin': '+',
+      }
+      const nastyChannel = '#nasty-channel'
+      const nastyUsers = {
+        'doctorevil': '@',
+        'minime': '',
+      }
+
+      const expected = {
+        [lovelyChannel]: lovelyUsers,
+        [nastyChannel]: nastyUsers,
+      }
+
+      this.client.emit('names', lovelyChannel, lovelyUsers)
+      this.client.emit('names', nastyChannel, nastyUsers)
+
+      const server = this.server
+      return Promise.delay(25)
+        .then(() => should.deepEqual(server.names, expected))
     })
   })
 

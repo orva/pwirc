@@ -9,11 +9,23 @@ export function server() {
     realName: 'Testuser Name',
     events: new EventEmitter(),
     allMessages: messages(),
+    privateMessages: [],
     irc: {
       supported: {
         channel: {
           types: '&#'
         }
+      }
+    },
+    names: {
+      '#test1': {
+        'user1': '@',
+        'user2': ''
+      },
+      '#test2': {
+        'user3': '@',
+        'user4': '',
+        'user5': ''
       }
     }
   }
@@ -58,7 +70,7 @@ export function config() {
         connectedUrl: 'chat.freenode.net',
         nick: 'test-user',
         realName: 'John Doe',
-        channels: ['#test1', '#test2']
+        channels: ['#test1', '#test2'],
       }
     ],
     servers: {
