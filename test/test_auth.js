@@ -35,7 +35,7 @@ describe('Auth', () => {
       const user = conf.user
       const spy = callWithSpy(user.username, pwd)
 
-      return Promise.delay(75)
+      return Promise.delay(175)
         .then(() => should(spy.calledWith(null, user)).be.true())
     })
 
@@ -43,7 +43,7 @@ describe('Auth', () => {
       const user = conf.user
       const spy = callWithSpy(user.username, 'invalid password')
 
-      return Promise.delay(75)
+      return Promise.delay(175)
         .then(() => should(spy.calledWith(null, false)).be.true())
     })
 
