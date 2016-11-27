@@ -55,25 +55,38 @@ describe('IrcServer', function() {
   })
 
   describe('names', function() {
+    const lovelyChannel = '#lovely-channel'
+    const lovelyUsers = {
+      'pooh': '@',
+      'moomin': '+',
+    }
+    const nastyChannel = '#nasty-channel'
+    const nastyUsers = {
+      'doctorevil': '@',
+      'minime': '',
+    }
+
     it('is updated when `server.irc` emits `names`', function() {
-      const lovelyChannel = '#lovely-channel'
-      const lovelyUsers = {
-        'pooh': '@',
-        'moomin': '+',
-      }
-      const nastyChannel = '#nasty-channel'
-      const nastyUsers = {
-        'doctorevil': '@',
-        'minime': '',
-      }
+      this.client.emit('names', lovelyChannel, lovelyUsers)
+      this.client.emit('names', nastyChannel, nastyUsers)
 
       const expected = {
         [lovelyChannel]: lovelyUsers,
         [nastyChannel]: nastyUsers,
       }
 
-      this.client.emit('names', lovelyChannel, lovelyUsers)
+      const server = this.server
+      return Promise.delay(25)
+        .then(() => should.deepEqual(server.names, expected))
+    })
+
+    it('is updated when `server.irc` emits `join`', function() {
       this.client.emit('names', nastyChannel, nastyUsers)
+      this.client.emit('join', nastyChannel, 'goldfinger')
+
+      const expected = {
+        [nastyChannel]: R.merge(nastyUsers, { 'goldfinger': '' })
+      }
 
       const server = this.server
       return Promise.delay(25)
@@ -365,14 +378,44 @@ describe('IrcServer', function() {
           })
       })
 
-      it('is emitted when `server.events` emits `event-join`')
-      it('is emitted when `server.events` emits `event-part`')
+      it('is emitted when another user joins channel', function(done) {
+        this.client.emit('names', lovelyChannel, lovelyUsers)
+        this.client.emit('names', nastyChannel, nastyUsers)
+
+        this.server.events.on('names', ev => {
+          const expected = {
+            [nastyChannel]: R.merge(nastyUsers, { 'goldfinger': '' })
+          }
+          should.deepEqual(ev, expected)
+          done()
+        })
+
+        this.client.emit('join', nastyChannel, 'goldfinger')
+      })
+
+      it('is emitted when another user parts channel')
     })
 
     describe('event-join', function() {
-      it('is emitted when someone else joins a channel')
-      it('is not emitted when user joins a channel')
-      it('contains expected fields in payload')
+      it('is emitted when someone else joins a channel', function(done) {
+        this.server.events.on('event-join', (ev) => {
+          const expected = { channel: '#another-channel', nick: 'other-user' }
+          should.deepEqual(ev, expected)
+          done()
+        })
+
+        this.client.emit('join', '#another-channel', 'other-user')
+      })
+
+      it('is not emitted when user joins a channel', function() {
+        const spy = sinon.spy()
+        const nick = this.server.nick
+        this.server.events.on('event-join', spy)
+        this.client.emit('join', '#another-channel', nick)
+
+        return Promise.delay(35)
+          .then(() => should(spy.called).be.false())
+      })
     })
 
     describe('event-part', function() {

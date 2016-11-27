@@ -92,6 +92,7 @@ const setupChannelEventlEmitters = session => {
     { type: 'message', callback: channelMessageListener },
     { type: 'private-message', callback: eventForwarder(session, 'private-message') },
     { type: 'names', callback: eventForwarder(session, 'names') },
+    { type: 'event-join', callback: eventForwarder(session, 'event-join') }
   ]
   R.forEach(l => session.server.events.on(l.type, l.callback), listeners)
 

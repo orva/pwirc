@@ -84,9 +84,17 @@ const setupServerEventListeners = server => {
     }
   })
 
-  server.irc.addListener('join', (chan, nick) => {
+  server.irc.addListener('join', (channel, nick) => {
     if (nick === server.irc.nick) {
-      server.events.emit('channel-joined', chan)
+      server.events.emit('channel-joined', channel)
+    } else {
+      const existingNameObj = server.names[channel] || {}
+      const updatedNameObj = R.merge(existingNameObj, { [nick]: '' })
+      const names = { [channel]: updatedNameObj }
+      server.names = R.merge(server.names, names)
+
+      server.events.emit('event-join', { channel, nick })
+      server.events.emit('names', names)
     }
   })
 
